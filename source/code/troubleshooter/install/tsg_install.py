@@ -38,7 +38,7 @@ def get_install_err_codes():
     return install_err_codes
 
 # ask if user has seen installation error code
-def ask_error_codes():
+def ask_install_error_codes():
     answer = input("Do you have an installation error code? (y/n): ")
     # TODO: add smth about where / how to see if user encountered error code in installation
     while (answer.lower() not in ['y','yes','n','no']):
@@ -80,7 +80,7 @@ def check_pkg_manager():
     if (is_rpm != ''):
         install_info['INSTALLER'] = 'rpm'
         return True
-    print("Error: this system does not have supported package manager. Please install "\
+    print("Error: this system does not have a supported package manager. Please install "\
           "'dpkg' or 'rpm' and run this troubleshooter again.")
     return False
 
@@ -171,7 +171,7 @@ def check_installation(err_codes=True):
     success = True
 
     if (err_codes):
-        if (not ask_error_codes()):
+        if (not ask_install_error_codes()):
             return False
 
     # check OS
