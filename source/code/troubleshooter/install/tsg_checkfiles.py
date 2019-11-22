@@ -3,7 +3,7 @@ import re
 import subprocess
 
 from tsg_info      import tsg_info
-from .tsg_checkoms import comp_versions_ge
+from .tsg_checkoms import comp_versions_ge, get_tsginfo_key
 
 
 
@@ -309,14 +309,7 @@ def check_filesystem():
 
         # getting workspace id for protected files
         if (df == "wid_files.data"):
-            try:
-                variables['WORKSPACE_ID'] = tsg_info['WORKSPACE_ID']
-            except KeyError:
-                # TODO: get function from tsg_checkendpts to update tsg_info
-                print("Error: could not access file {0} due to inadequate permissions. "\
-                      "Please run the troubleshooter as root in order to allow access "\
-                      "to figure out the issue with OMS Agent.".format(conf_path))
-                return False
+            variables['WORKSPACE_ID'] = get_tsginfo_key('WORKSPACE_ID')
 
         # populate dictionaries with info from data files
         get_data((os.path.join(dfs_path, df)), variables, files, links, dirs)
