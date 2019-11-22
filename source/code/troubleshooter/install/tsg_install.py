@@ -1,11 +1,11 @@
 import os
 import subprocess
 
-from .tsg_install_info import install_info
-from .tsg_checkos      import check_os
-from .tsg_checkoms     import check_oms
-from .tsg_checkfiles   import check_filesystem
-from .tsg_checkpkgs    import check_packages
+from tsg_info        import tsg_info
+from .tsg_checkos    import check_os
+from .tsg_checkoms   import check_oms
+from .tsg_checkfiles import check_filesystem
+from .tsg_checkpkgs  import check_packages
 
 # backwards compatible input() function for Python 2 vs 3
 try:
@@ -73,12 +73,12 @@ def check_pkg_manager():
     is_dpkg = subprocess.Popen(['which', 'dpkg'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)\
                 .communicate()[0].decode('utf8')
     if (is_dpkg != ''):
-        install_info['INSTALLER'] = 'dpkg'
+        tsg_info['INSTALLER'] = 'dpkg'
         return True
     is_rpm = subprocess.Popen(['which', 'rpm'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)\
                 .communicate()[0].decode('utf8')
     if (is_rpm != ''):
-        install_info['INSTALLER'] = 'rpm'
+        tsg_info['INSTALLER'] = 'rpm'
         return True
     print("Error: this system does not have a supported package manager. Please install "\
           "'dpkg' or 'rpm' and run this troubleshooter again.")

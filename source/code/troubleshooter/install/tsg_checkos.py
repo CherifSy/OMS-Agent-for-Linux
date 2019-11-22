@@ -4,7 +4,7 @@ import copy
 import os
 import subprocess
 
-from .tsg_install_info import install_info
+from tsg_info import tsg_info
 
 
 
@@ -73,7 +73,7 @@ def get_os_bits():
                 .communicate()[0].decode('utf-8')
     cpu_opmodes = (cpu_info.split('\n'))[1]
     cpu_bits = cpu_opmodes[-6:]
-    install_info['CPU_BITS'] = cpu_bits
+    tsg_info['CPU_BITS'] = cpu_bits
     return cpu_bits
 
 
@@ -83,19 +83,19 @@ def get_os_version():
         for line in os_file:
             line = line.replace('"', '')
             info = line.split('=')
-            install_info['OS_' + (info[0])] = (info[1]).rstrip('\n')
+            tsg_info['OS_' + (info[0])] = (info[1]).rstrip('\n')
 
 
 # print out warning if running the wrong version of OS system
 def print_wrong_version(cpu_bits):
     print("This version of {0} ({1}) is not supported. For {2} machines, please download " \
-          "{0} ".format(install_info['OS_NAME'], install_info['OS_PRETTY_NAME'], cpu_bits), \
+          "{0} ".format(tsg_info['OS_NAME'], tsg_info['OS_PRETTY_NAME'], cpu_bits), \
           end='')
     versions = None
     if (cpu_bits == '32-bit'):
-        versions = copy.deepcopy(supported_32bit[install_info['OS_ID']])
+        versions = copy.deepcopy(supported_32bit[tsg_info['OS_ID']])
     elif (cpu_bits == '64-bit'):
-        versions = copy.deepcopy(supported_64bit[install_info['OS_ID']])
+        versions = copy.deepcopy(supported_64bit[tsg_info['OS_ID']])
     last = versions.pop()
     if (versions == []):
         print("{0}.".format(last))
@@ -105,20 +105,20 @@ def print_wrong_version(cpu_bits):
     
 # check version of OS
 def check_os_version(cpu_bits):
-    if ((cpu_bits == '32-bit') and (install_info['OS_ID'] in supported_32bit.keys())):
-        if (install_info['OS_VERSION_ID'] in supported_32bit[install_info['OS_ID']]):
+    if ((cpu_bits == '32-bit') and (tsg_info['OS_ID'] in supported_32bit.keys())):
+        if (tsg_info['OS_VERSION_ID'] in supported_32bit[tsg_info['OS_ID']]):
             return True
         else:
             print_wrong_version(cpu_bits)
             return False
-    elif ((cpu_bits == '64-bit') and (install_info['OS_ID'] in supported_64bit.keys())):
-        if (install_info['OS_VERSION_ID'] in supported_64bit[install_info['OS_ID']]):
+    elif ((cpu_bits == '64-bit') and (tsg_info['OS_ID'] in supported_64bit.keys())):
+        if (tsg_info['OS_VERSION_ID'] in supported_64bit[tsg_info['OS_ID']]):
             return True
         else:
             print_wrong_version(cpu_bits)
             return False
     else:
-        print("{0} is not supported.".format(install_info['OS_PRETTY_NAME']))
+        print("{0} is not supported.".format(tsg_info['OS_PRETTY_NAME']))
         return False
     
 

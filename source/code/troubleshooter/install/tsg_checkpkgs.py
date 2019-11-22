@@ -1,6 +1,6 @@
 import subprocess
 
-from .tsg_install_info import install_info
+from tsg_info import tsg_info
 
 def get_dpkg_pkg_version(pkg):
     dpkg_info = subprocess.Popen(['dpkg', '-s', pkg], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)\
@@ -18,7 +18,7 @@ def get_dpkg_pkg_version(pkg):
             return None
         if (line.startswith('Version: ')):
             version = (line.split())[-1]
-            install_info['{0}_VERSION'.format(pkg.upper())] = version
+            tsg_info['{0}_VERSION'.format(pkg.upper())] = version
             return version
     return None
 
@@ -36,16 +36,16 @@ def get_rpm_pkg_version(pkg):
         if (line.startswith('Version')):
             parsed_line = line.replace(' ','').split(':')  # ['Version', version]
             version = parsed_line[1]
-            install_info['{0}_VERSION'.format(pkg.upper())] = version
+            tsg_info['{0}_VERSION'.format(pkg.upper())] = version
             return version
     return None
             
 def get_package_version(pkg):
     # dpkg
-    if (install_info['INSTALLER'] == 'dpkg'):
+    if (tsg_info['INSTALLER'] == 'dpkg'):
         return get_dpkg_pkg_version(pkg)
     # rpm
-    elif (install_info['INSTALLER'] == 'rpm'):
+    elif (tsg_info['INSTALLER'] == 'rpm'):
         return get_rpm_pkg_version(pkg)
     else:
         return None
