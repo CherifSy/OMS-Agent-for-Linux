@@ -14,17 +14,22 @@ def check_e2e():
     # TODO: fix instructions, make them more accurate
     print("smth about going into workspace to get ready to run queries")
     print("Please go to https://ms.portal.azure.com and navigate to your workspace. "\
-          "Once there, please ... (figure out what user needs to do)")
+          "Once there, please navigate to the 'Logs' blade, and input the queries "\
+          "that will be printed below. If the query was successful, then you should "\
+          "see one result; if not, then there will be no results.")
+    print("WARNING: not all of these will necessarily have information! Specifically, "\
+          "ApacheAccess_CL, MySQL_CL, or Custom_Log_CL will have no results if you "\
+          "don't use Apache, MySQL, or Custom Logs, respectively. You can always skip "\
+          "certain queries if you don't want to test them by typing 's' or 'skip'.")
     # ask if user wants to skip entire query section
-    skip_all = input("Do you want to skip this section? (y/n): ")
+    skip_all = input("Do you want to skip this entire section (all queries)? (y/n): ")
     while (skip_all.lower() not in ['y','yes','n','no']):
         print("Unclear input. Please type either 'y'/'yes' or 'n'/'no' to proceed.")
-        skip_all = input("Do you want to skip this section? (y/n): ")
+        skip_all = input("Do you want to skip this entire section (all queries)? (y/n): ")
 
     if (skip_all.lower() in ['n','no']):
         for source in sources:
-            # TODO: create query string
-            query = None
+            query = "{0} | where Computer == '{1}' | take 1".format(source, hostname)
             print("Please run this query:")
             print(query)
 
