@@ -11,8 +11,6 @@ def check_e2e():
     successes = []
     failures = []
 
-    # TODO: fix instructions, make them more accurate
-    print("smth about going into workspace to get ready to run queries")
     print("Please go to https://ms.portal.azure.com and navigate to your workspace. "\
           "Once there, please navigate to the 'Logs' blade, and input the queries "\
           "that will be printed below. If the query was successful, then you should "\
