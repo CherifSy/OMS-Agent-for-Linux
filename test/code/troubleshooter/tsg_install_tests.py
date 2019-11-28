@@ -157,12 +157,12 @@ def test_check_pkg_manager():
     dpkg_popen = Test_Popen('/usr/bin/dpkg', '', 'dpkg')
     with unittest.mock.patch('subprocess.Popen', dpkg_popen.init_check_pkg_manager):
         assert(tsg_install.check_pkg_manager())
-        assert(install_info['INSTALLER'] == 'dpkg')
+        assert(install_info['PKG_MANAGER'] == 'dpkg')
     # check rpm
     rpm_popen = Test_Popen('/usr/bin/rpm', '', 'rpm')
     with unittest.mock.patch('subprocess.Popen', rpm_popen.init_check_pkg_manager):
         assert(tsg_install.check_pkg_manager())
-        assert(install_info['INSTALLER'] == 'rpm')
+        assert(install_info['PKG_MANAGER'] == 'rpm')
     # check neither
     neither_popen = Test_Popen('none', '', 'neither')
     with unittest.mock.patch('subprocess.Popen', neither_popen.init_check_pkg_manager):

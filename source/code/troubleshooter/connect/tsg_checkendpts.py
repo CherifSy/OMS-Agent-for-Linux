@@ -3,7 +3,10 @@
 import socket
 
 from tsg_info             import tsg_info
+from tsg_errors           import tsg_error_info
 from install.tsg_checkoms import get_tsginfo_key
+
+omsadmin_path = "/etc/opt/microsoft/omsagent/conf/omsadmin.conf"
 
 # check if is fairfax region
 def is_fairfax_region():
@@ -20,15 +23,43 @@ def check_endpt(endpoint):
     except Exception:
         return False
 
-# ping endpoints to check if connected
+
+
+# check general internet connectivity
+def check_internet_connect():
+    if (check_endpt("bing.com") and check_endpt("google.com")):
+        return 0
+    else:
+        return 127
+
+
+
+# check agent service endpoint
+def check_agent_service_endpt():
+    dsc_endpt = get_tsginfo_key['DSC_ENDPOINT']
+    if (dsc_endpt == None):
+        tsg_error_info.append(('DSC (agent service) endpoint', omsadmin_path))
+        return 118
+    agent_endpt = dsc_endpt[8:]
+
+    if (check_endpt(agent_endpt)):
+        return 0
+    else:
+        tsg_error_info.append((agent_endpt,))
+        return 119
+
+
+
+
+# check log analytics endpoints
 def check_log_analytics_endpts():
+    success = 0
+
     # get workspace ID
     workspace = get_tsginfo_key('WORKSPACE_ID')
     if (workspace == None):
-        omsadmin_path = "/etc/opt/microsoft/omsagent/conf/omsadmin.conf"
-        print("Error in getting workspace ID. Please check {0} to make sure the workspace "\
-              "ID has been added successfully.")
-        return False
+        tsg_error_info.append(('workspace ID', omsadmin_path))
+        return 118
 
     # get log analytics endpoints
     if (is_fairfax_region()):
@@ -46,7 +77,7 @@ def check_log_analytics_endpts():
 
         # ping endpoint
         if (not check_endpt(endpt)):
-            print("Error: endpoint {0} could not connect.".format(endpt))
-            return False
+            tsg_error_info.append((endpt,))
+            success = 119
 
-    return True
+    return success

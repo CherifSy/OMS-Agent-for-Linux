@@ -1,7 +1,16 @@
 # INSPIRED BY verify_e2e.py
 
+import subprocess
+
+# backwards compatible input() function for Python 2 vs 3
+try:
+    input = raw_input
+except NameError:
+    pass
 
 def check_e2e():
+    success = 0
+
     # get machine's hostname
     hostname = subprocess.Popen(['hostname'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)\
                 .communicate()[0].decode('utf8').rstrip('\n')
@@ -59,7 +68,7 @@ def check_e2e():
                 # quit troubleshooter
                 if (quit_tsg.lower() in ['n','no']):
                     print("Exiting troubleshooter...")
-                    return False
+                    return 1
                 # ask to quit this section
                 elif (quit_tsg.lower() in ['y','yes']):
                     quit_section = input("Do you want to continue with this section?")
@@ -68,7 +77,6 @@ def check_e2e():
                         quit_section = input("Do you want to continue with this section?")
                     # quit section
                     if (quit_section.lower() in ['n','no']):
-                        print("Continuing on with troubleshooter...")
                         break
                     # continue queries
                     elif (quit_section.lower() in ['y','yes']):
@@ -76,12 +84,13 @@ def check_e2e():
                         continue
             
         # summarize query section
-        success_qs = successes.join(', ') if (len(successes) > 0) else 'none'
-        failed_qs  = failures.join(', ')  if (len(failures) > 0)  else 'none'
+        success_qs = ', '.join(successes) if (len(successes) > 0) else 'none'
+        failed_qs  = ', '.join(failures)  if (len(failures) > 0)  else 'none'
         print("Successful queries: {0}".format(success_qs))
         print("Failed queries: {0}".format(failed_qs))
         
         if (len(failures) > 0):
+            success = 101
             # ask to quit troubleshooter completely
             quit_tsg = input("Do you want to continue with the troubleshooter?")
             while (quit_tsg.lower() not in ['y','yes','n','no']):
@@ -90,11 +99,9 @@ def check_e2e():
             # quit troubleshooter
             if (quit_tsg.lower() in ['n','no']):
                 print("Exiting troubleshooter...")
-                return False
+                return 1
+    
+    print("Continuing on with troubleshooter...")
 
-    # skipping entire section
-    elif (skip_all.lower() in ['n','no']):
-        print("Continuing on with troubleshooter...")
-
-    return True
+    return success
                     

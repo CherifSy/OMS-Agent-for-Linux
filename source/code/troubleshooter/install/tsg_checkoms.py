@@ -1,9 +1,9 @@
 import re
-import subprocess
 import urllib
 import errno
 
 from tsg_info       import tsg_info
+from tsg_errors     import tsg_error_info, print_errors
 from .tsg_checkpkgs import get_package_version
 
 # backwards compatible input() function for Python 2 vs 3
@@ -25,7 +25,6 @@ def get_oms_version():
     version = get_package_version('omsagent')
     # couldn't find OMSAgent
     if (version == None):
-        print("Error: could not get OMSAgent Version.")
         return None
     return version
 
@@ -40,7 +39,6 @@ def get_curr_oms_version():
             parsed_line = line.split(' | ') # [package, version, description]
             tsg_info['UPDATED_OMS_VERSION'] = parsed_line[1]
             return parsed_line[1]
-    print("Error trying to get current released version.")
     return None
 
 
@@ -77,16 +75,6 @@ def comp_versions_ge(v1, v2):
 
 
 
-def print_old_version(oms_version):
-    print("You are currently running OMS Version {0}. This troubleshooter only "\
-          "supports versions 1.11 and newer. Please head to the Github link below "\
-          "and click on 'Download Latest OMS Agent for Linux ({1})' in order to update "\
-          "to the newest version:".format(oms_version, tsg_info['CPU_BITS']))
-    print("https://github.com/microsoft/OMS-Agent-for-Linux")
-    print("And follow the instructions given here:")
-    print("https://github.com/microsoft/OMS-Agent-for-Linux/blob/master/docs"\
-            "/OMS-Agent-for-Linux.md#upgrade-from-a-previous-release")
-
 def ask_update_old_version(oms_version, curr_oms_version):
     print("You are currently running OMS Verion {0}. There is a newer version "\
           "available which may fix your issue (version {1}).".format(oms_version, curr_oms_version))
@@ -104,11 +92,11 @@ def ask_update_old_version(oms_version, curr_oms_version):
         print("And follow the instructions given here:")
         print("https://github.com/microsoft/OMS-Agent-for-Linux/blob/master/"\
                 "docs/OMS-Agent-for-Linux.md#upgrade-from-a-previous-release")
-        return False
+        return 1
     # user doesn't want to update
     elif (answer.lower() in ['n', 'no']):
         print("Continuing on with troubleshooter...")
-        return True
+        return 0
 
 
 
@@ -120,17 +108,14 @@ def update_tsg_info():
             for line in conf_file:
                 parsed_line = (line.rstrip('\n')).split('=')
                 tsg_info[parsed_line[0]] = parsed_line[1]
-        return True
+        return 0
     except IOError as e:
         if (e.errno == errno.EACCES):
-            print("Error: could not access file {0} due to inadequate permissions. "\
-                  "Please run the troubleshooter as root in order to allow access "\
-                  "to figure out the issue with OMS Agent.".format(conf_path))
-            return False
+            tsg_error_info.append((conf_path,))
+            return 100
         else:
             print("Error: could not access file {0}".format(conf_path))
             raise
-        return False
 
 # get value from omsadmin.conf information in tsg_info dict
 def get_tsginfo_key(k):
@@ -138,7 +123,9 @@ def get_tsginfo_key(k):
     try:
         val = tsg_info[k]
     except KeyError:
-        if (not update_tsg_info()):
+        updated_tsg_info = update_tsg_info()
+        if (updated_tsg_info != 0):
+            print_errors(updated_tsg_info, reinstall=False)
             return None
         val = tsg_info[k]
     if (val == ''):
@@ -150,19 +137,20 @@ def get_tsginfo_key(k):
 def check_oms():
     oms_version = get_oms_version()
     if (oms_version == None):
-        return False
+        return 110
 
     # check if version is >= 1.11
     if (not comp_versions_ge(oms_version, '1.11')):
-        print_old_version(oms_version)
-        return False
+        tsg_error_info.append((oms_version, tsg_info['CPU_BITS']))
+        return 111
 
     # if not most updated version, ask if want to update
     curr_oms_version = get_curr_oms_version()
     if (curr_oms_version == None):
-        return False
+        return 112
 
     if (not comp_versions_ge(oms_version, curr_oms_version)):
-        return ask_update_old_version(oms_version, curr_oms_version)
+        if (ask_update_old_version(oms_version, curr_oms_version) == 1):
+            return 1
 
     return update_tsg_info()

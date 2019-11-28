@@ -1,10 +1,8 @@
-from __future__ import print_function
-
-import copy
 import os
 import subprocess
 
-from tsg_info import tsg_info
+from tsg_info   import tsg_info
+from tsg_errors import tsg_error_info
 
 
 
@@ -86,40 +84,37 @@ def get_os_version():
             tsg_info['OS_' + (info[0])] = (info[1]).rstrip('\n')
 
 
+
 # print out warning if running the wrong version of OS system
-def print_wrong_version(cpu_bits):
-    print("This version of {0} ({1}) is not supported. For {2} machines, please download " \
-          "{0} ".format(tsg_info['OS_NAME'], tsg_info['OS_PRETTY_NAME'], cpu_bits), \
-          end='')
-    versions = None
-    if (cpu_bits == '32-bit'):
+def get_alternate_versions():
+    if (tsg_info['CPU_BITS'] == '32-bit'):
         versions = copy.deepcopy(supported_32bit[tsg_info['OS_ID']])
-    elif (cpu_bits == '64-bit'):
+    elif (tsg_info['CPU_BITS'] == '64-bit'):
         versions = copy.deepcopy(supported_64bit[tsg_info['OS_ID']])
     last = versions.pop()
     if (versions == []):
-        print("{0}.".format(last))
+        s = "{0}.".format(last)
     else:
-        print("{0} or {1}.".format(', '.join(versions), last))
-    
+        s = "{0} or {1}.".format(', '.join(versions), last)
+    return s
     
 # check version of OS
 def check_os_version(cpu_bits):
     if ((cpu_bits == '32-bit') and (tsg_info['OS_ID'] in supported_32bit.keys())):
         if (tsg_info['OS_VERSION_ID'] in supported_32bit[tsg_info['OS_ID']]):
-            return True
+            return 0
         else:
-            print_wrong_version(cpu_bits)
-            return False
+            tsg_error_info.append((tsg_info['OS_NAME'], tsg_info['OS_PRETTY_NAME'], cpu_bits, get_alternate_versions()))
+            return 103
     elif ((cpu_bits == '64-bit') and (tsg_info['OS_ID'] in supported_64bit.keys())):
         if (tsg_info['OS_VERSION_ID'] in supported_64bit[tsg_info['OS_ID']]):
-            return True
+            return 0
         else:
-            print_wrong_version(cpu_bits)
-            return False
+            tsg_error_info.append((tsg_info['OS_NAME'], tsg_info['OS_PRETTY_NAME'], cpu_bits, get_alternate_versions()))
+            return 103
     else:
-        print("{0} is not supported.".format(tsg_info['OS_PRETTY_NAME']))
-        return False
+        tsg_error_info.append((tsg_info['OS_PRETTY_NAME'],))
+        return 104
     
 
 
@@ -132,8 +127,7 @@ def check_os():
     # 32 bit or 64 bit
     cpu_bits = get_os_bits()
     if (cpu_bits == None or (cpu_bits not in ['32-bit', '64-bit'])):
-        print("Error getting if CPU is 32-bit or 64-bit.")
-        return False
+        return 102
 
     # get OS version info
     get_os_version()

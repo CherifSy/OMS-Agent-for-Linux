@@ -3,6 +3,7 @@ import re
 import subprocess
 
 from tsg_info      import tsg_info
+from tsg_errors    import tsg_error_info
 from .tsg_checkoms import comp_versions_ge, get_tsginfo_key
 
 
@@ -135,36 +136,29 @@ def perm_symb_to_oct(p):
 
 # Check permissions are correct for each file
 # info: [permissions, user, group]
-def check_permissions(f, perm_info, corr_info, typ):
-    success = True
+def check_permissions(f, perm_info, corr_info, typ, perms_err):
+    success = 0
     # check user
     perm_user = perm_info[1]
     corr_user = corr_info[1]
     if ((perm_user != corr_user) and (perm_user != 'omsagent')):
-        print("Error: {0} {1} has user {2} instead of user "\
-              "{3}.".format(typ, f, perm_user, corr_user))
-        success = False
+        perms_err.append((typ, f, 'user', perm_user, corr_user))
+        success = 114
     
     # check group
     perm_group = perm_info[2]
     corr_group = corr_info[2]
     if ((perm_group != corr_group) and (perm_group != 'omiusers')):
-        print("Error: {0} {1} has group {2} instead of group "\
-              "{3}.".format(typ, f, perm_group, corr_group))
-        success = False
+        perms_err.append((typ, f, 'group', perm_group, corr_group))
+        success = 114
     
     # check permissions
     perms = (perm_info[0])[1:]
     corr_perms = perm_oct_to_symb(corr_info[0])
     if (perms != corr_perms):
-        print("Error: {0} {1} has permissions {2} instead of permissions "\
-              "{3}.".format(typ, f, perms, corr_perms))
-        success = False
+        perms_err.append((typ, f, 'permissions', perms, corr_perms))
+        success = 114
     return success
-
-
-
-# CHECK WORKSPACE ID STUFF / FILES TO MAKE SURE THEY HAVE CORR PERMS OF OMSAGENT AND OMIUSERS
     
 
 
@@ -176,8 +170,8 @@ def get_ll_dir(ll_output, d):
     ll_line = list(filter(lambda x : x.endswith(' ' + d_end), ll_lines))[0]
     return ll_line.split()
 
-def check_dirs(dirs):
-    success = True
+def check_dirs(dirs, exist_err, perms_err):
+    success = 0
     missing_dirs = []
     for d in (dirs.keys()):
         if (any(d.startswith(md) for md in missing_dirs)):
@@ -185,12 +179,12 @@ def check_dirs(dirs):
             continue
         # check if folder exists
         elif (not os.path.isdir(d)):
-            print("Error: directory {0} does not exist.".format(d))
             missing_dirs += d
-            success = False
+            exist_err.append(('directory', d))
+            success = 113
             continue
         # check if permissions are correct
-        try:
+        if (success != 113):
             # get permissions
             ll_output = subprocess.Popen(['ls', '-l', os.path.join(d, '..')], stdout=subprocess.PIPE, \
                             stderr=subprocess.STDOUT).communicate()[0].decode('utf-8')
@@ -198,30 +192,24 @@ def check_dirs(dirs):
             ll_info = get_ll_dir(ll_output, d)
             perm_info = [ll_info[0]] + ll_info[2:4]
             corr_info = dirs[d]
-            if (not check_permissions(d, perm_info, corr_info, "directory")):
-                success = False
-            continue
-        except:
-            print("Error with trying to check permissions for directory {0}.".format(d))
-            raise
-            success = False
-            continue
+            if (check_permissions(d, perm_info, corr_info, "directory", perms_err) != 0):
+                success = 114
     return success
 
 
 
 # Check files exist
 
-def check_files(files):
-    success = True
+def check_files(files, exist_err, perms_err):
+    success = 0
     for f in (files.keys()):
         # check if file exists
         if (not os.path.isfile(f)):
-            print("Error: file {0} does not exist.".format(f))
-            success = False
+            exist_err.append(('file', f))
+            success = 113
             continue
         # check if permissions are correct
-        try:
+        if (success != 113):
             # get permissions
             ll_output = subprocess.Popen(['ls', '-l', f], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)\
                             .communicate()[0].decode('utf-8')
@@ -229,14 +217,8 @@ def check_files(files):
             ll_info = ll_output.split()
             perm_info = [ll_info[0]] + ll_info[2:4]
             corr_info = files[f]
-            if (not check_permissions(f, perm_info, corr_info, "file")):
-                success = False
-            continue
-        except:
-            print("Error with trying to check permissions for file {0}.".format(f))
-            raise
-            success = False
-            continue
+            if (check_permissions(f, perm_info, corr_info, "file", perms_err) != 0):
+                success = 114
     return success
 
             
@@ -245,16 +227,16 @@ def check_files(files):
 
 # Check links exist
 
-def check_links(links):
+def check_links(links, exist_err, perms_err):
     success = True
     for l in (links.keys()):
         # check if link exists
         if (not os.path.islink(l)):
-            print("Error: link {0} does not exist.".format(l))
-            success = False
+            exist_err.append(('link', l))
+            success = 113
             continue
         # check if permissions are correct
-        try:
+        if (success != 113):
             linked_file = links[l][-1]
             # in case a link points to a link
             while (os.path.islink(linked_file)):
@@ -271,13 +253,8 @@ def check_links(links):
             # ll_info: [perms, items, user, group, size, month mod, day mod, time mod, name]
             perm_info = [ll_info[0]] + ll_info[2:4]
             corr_info = links[l][:-1]
-            if (not check_permissions(l, perm_info, corr_info, "link")):
-                success = False
-            continue
-        except:
-            print("Error with trying to check permissions for link {0}.".format(l))
-            success = False
-            continue
+            if (check_permissions(l, perm_info, corr_info, "link", perms_err) != 0):
+                success = 114
     return success
 
 
@@ -287,9 +264,13 @@ def check_links(links):
 # Check everything
 
 def check_filesystem():
-    success = True
+    success = 0
 
     dfs_path = "install/files/datafiles"  # path to datafiles from troubleshooter/
+
+    # create lists to track errors
+    exist_err = []
+    perms_err = []
 
     datafiles = os.listdir(dfs_path)
     for df in datafiles:
@@ -314,17 +295,23 @@ def check_filesystem():
         # populate dictionaries with info from data files
         get_data((os.path.join(dfs_path, df)), variables, files, links, dirs)
 
-        # check directories
-        if (not check_dirs(dirs)):
-            success = False
+        # check everything
+        checked_dirs = check_dirs(dirs, exist_err, perms_err)
+        checked_files = check_files(files, exist_err, perms_err)
+        checked_links = check_links(links, exist_err, perms_err)
 
-        # check files
-        if (not check_files(files)):
-            success = False
+        # some paths are missing
+        if (113 in [checked_dirs, checked_files, checked_links]):
+            success = 113
 
-        # check links
-        if (not check_links(links)):
-            success = False
+        # some paths have incorrect permissions
+        elif ((114 in [checked_dirs, checked_files, checked_links]) and (success != 113)):
+            success = 114
 
-    # all successful
+    # update errors
+    if (success == 113):
+        tsg_error_info = exist_err
+    elif (success == 114):
+        tsg_error_info = perms_err
+
     return success

@@ -2,10 +2,11 @@ import os
 import subprocess
 
 from tsg_info        import tsg_info
+from tsg_errors      import tsg_error_info, print_errors
 from .tsg_checkos    import check_os
 from .tsg_checkoms   import check_oms
 from .tsg_checkfiles import check_filesystem
-from .tsg_checkpkgs  import check_packages
+from .tsg_checkpkgs  import check_pkg_manager, check_packages
 
 # backwards compatible input() function for Python 2 vs 3
 try:
@@ -62,60 +63,23 @@ def ask_install_error_codes():
                 answer1 = input("Would you like to continue with the troubleshooter? (y/n): ")
             if (answer1.lower() in ['n','no']):
                 print("Exiting troubleshooter...")
-                return False
+                return 1
     print("Continuing on with troubleshooter...")
-    return True
-
-
-
-# check which installer the machine is using
-def check_pkg_manager():
-    is_dpkg = subprocess.Popen(['which', 'dpkg'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)\
-                .communicate()[0].decode('utf8')
-    if (is_dpkg != ''):
-        tsg_info['INSTALLER'] = 'dpkg'
-        return True
-    is_rpm = subprocess.Popen(['which', 'rpm'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)\
-                .communicate()[0].decode('utf8')
-    if (is_rpm != ''):
-        tsg_info['INSTALLER'] = 'rpm'
-        return True
-    print("Error: this system does not have a supported package manager. Please install "\
-          "'dpkg' or 'rpm' and run this troubleshooter again.")
-    return False
+    return 0
 
 
 
 # check space in MB for each main directory
 def check_space():
-    success = True
+    success = 0
     dirnames = ["/etc", "/opt", "/var"]
     for dirname in dirnames:
         space = os.statvfs(dirname)
         free_space = space.f_bavail * space.f_frsize / 1024 / 1024
         if (free_space < 500):
-            print("Error: directory {0} doesn't have enough space to install OMS. "\
-                  "Please free up some space and try installing again.".format(dirname))
-            success = False
+            tsg_error_info.append((dirname, free_space))
+            success = 105
     return success
-
-
-
-# ask user if they want to reinstall OMS Agent
-def ask_reinstall():
-    answer = input("Would you like to uninstall and reinstall OMS Agent to see if "\
-                   "that fixes the issue you're having? (y/n): ")
-    while (answer.lower() not in ['y','yes','n','no']):
-        print("Unclear input. Please type either 'y'/'yes' or 'n'/'no' to proceed.")
-        answer = input("Would you like to uninstall and reinstall OMS Agent to see if "\
-                   "that fixes the issue you're having? (y/n): ")
-    if (answer.lower() in ['y','yes']):
-        print("Please run the command `sudo sh ./omsagent-*.universal.x64.sh --purge` to "\
-              "uninstall, and `sudo sh ./omsagent-*.universal.x64.sh --install` to reinstall.")
-        return False
-    elif (answer.lower() in ['n','no']):
-        print("Continuing on with troubleshooter...")
-        return True
 
 
 
@@ -126,20 +90,16 @@ def check_cert():
         crt_info = subprocess.Popen(['openssl', 'x509', '-in', crt_path, '-text', '-noout'], stdout=subprocess.PIPE, \
                     stderr=subprocess.STDOUT).communicate()[0].decode('utf8')
         if (crt_info.startswith("Certificate:\n")):
-            return True
-        print("Error: Certificate is invalid, please check {0} for the issue.".format(crt_path))
-        return False
+            return 0
+        tsg_error_info.append((crt_path,))
+        return 115
     except IOError as e:
         if (e.errno == errno.EACCES):
             # permissions error, needs to be run as sudo
-            print("Error: could not access file {0} due to inadequate permissions. "\
-                  "Please run the troubleshooter as root in order to allow access "\
-                  "to figure out the issue with OMS Agent.".format(crt_path))
-            return False
+            tsg_error_info.append((crt_path,))
+            return 100
         else:
-            print("Error: could not access file {0}".format(crt_path))
             raise
-        return False
 
 # check RSA private key
 def check_key():
@@ -148,89 +108,89 @@ def check_key():
         key_info = subprocess.Popen(['openssl', 'rsa', '-in', key_path, '-check'], stdout=subprocess.PIPE, \
                     stderr=subprocess.STDOUT).communicate()[0].decode('utf8')
         if ("RSA key ok\n" in key_info):
-            return True
-        print("Error: RSA key is invalid, plese check {0} for the issue.".format(key_path))
-        return False
+            return 0
+        tsg_error_info.append((key_path,))
+        return 116
     except IOError as e:
         if (e.errno == errno.EACCES):
             # permissions error, needs to be run as sudo
-            print("Error: could not access file {0} due to inadequate permissions. "\
-                  "Please run the troubleshooter as root in order to allow access "\
-                  "to figure out the issue with OMS Agent.".format(key_path))
-            return False
+            tsg_error_info.append((key_path,))
+            return 100
         else:
-            print("Error: could not access file {0}".format(key_path))
             raise
-        return False
 
 
 
 
 # check all packages are installed
 def check_installation(err_codes=True):
-    success = True
-
+    # keep track of if all tests have been successful
+    success = 0
+    
     if (err_codes):
-        if (not ask_install_error_codes()):
-            return False
+        if (ask_install_error_codes() == 1):
+            return 1
 
     # check OS
     print("Checking if running a supported OS version...")
-    if (not check_os()):
-        return False
+    checked_os = check_os()
+    if (checked_os != 0):
+        return print_errors(checked_os, reinstall=False)
     
     # check space available
     print("Checking if enough disk space is available...")
-    if (not check_space()):
-        return False
+    checked_space = check_space()
+    if (checked_space != 0):
+        return print_errors(checked_space, reinstall=False)
 
     # check package manager
     print("Checking if machine has a supported package manager...")
-    if (not check_pkg_manager()):
-        return False
+    checked_pkg_manager = check_pkg_manager()
+    if (checked_pkg_manager != 0):
+        return print_errors(checked_pkg_manager, reinstall=False)
     
     # check packages are installed
-    print("Checking packages installed correctly...")
-    if (not check_packages()):
-        if (ask_reinstall()):
-            success = False
+    print("Checking if packages installed correctly...")
+    checked_packages = check_packages()
+    if (checked_packages != 0):
+        if (print_errors(checked_packages) == 1):
+            return 1
         else:
-            return False
+            success = 101
 
     # check OMS version
     print("Checking if running a supported version of OMS...")
-    if (not check_oms()):
-        if (ask_reinstall()):
-            success = False
+    checked_oms = check_oms()
+    if (checked_oms != 0):
+        if (print_errors(checked_oms) == 1):
+            return 1
         else:
-            return False
+            success = 101
 
     # check all files
-    print("Checking all files installed correctly (may take some time)...")
-    if (not check_filesystem()):
-        if (ask_reinstall()):
-            success = False
+    print("Checking if all files installed correctly (may take some time)...")
+    checked_files = check_filesystem()
+    if (checked_files != 0):
+        if (print_errors(checked_files) == 1):
+            return 1
         else:
-            return False
+            success = 101
 
     # check certs
     print("Checking certificate and RSA key are correct...")
-    if (not check_cert()):
-        if (ask_reinstall()):
-            success = False
+    checked_cert = check_cert()
+    if (checked_cert != 0):
+        if (print_errors(checked_cert) == 1):
+            return 1
         else:
-            return False
-    if (not check_key()):
-        if (ask_reinstall()):
-            success = False
+            success = 101
+    checked_key = check_key()
+    if (checked_key != 0):
+        if (print_errors(checked_key) == 1):
+            return 1
         else:
-            return False
+            success = 101
     
-    if (success):
-        print("Couldn't find any errors in the install process.")
-        return True
-    else:
-        print("One or more errors found in the install process. Please go through "\
-            "the error messages above to help find the issue.")
+    return success
 
     

@@ -1,6 +1,24 @@
 import subprocess
 
-from tsg_info import tsg_info
+from tsg_info   import tsg_info
+from tsg_errors import print_errors
+
+# check which installer the machine is using
+def check_pkg_manager():
+    is_dpkg = subprocess.Popen(['which', 'dpkg'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)\
+                .communicate()[0].decode('utf8')
+    if (is_dpkg != ''):
+        tsg_info['PKG_MANAGER'] = 'dpkg'
+        return 0
+    is_rpm = subprocess.Popen(['which', 'rpm'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)\
+                .communicate()[0].decode('utf8')
+    if (is_rpm != ''):
+        tsg_info['PKG_MANAGER'] = 'rpm'
+        return 0
+    # neither
+    return 106
+
+
 
 def get_dpkg_pkg_version(pkg):
     dpkg_info = subprocess.Popen(['dpkg', '-s', pkg], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)\
@@ -41,11 +59,21 @@ def get_rpm_pkg_version(pkg):
     return None
             
 def get_package_version(pkg):
+    try:
+        pkg_mngr = tsg_info['PKG_MANAGER']
+    except KeyError:
+        # need to get package manager
+        checked_pkg_mngr = check_pkg_manager()
+        if (checked_pkg_mngr != 0):
+            print_errors(checked_pkg_mngr, reinstall=False)
+            return None
+        pkg_mngr = tsg_info['PKG_MANAGER']
+
     # dpkg
-    if (tsg_info['INSTALLER'] == 'dpkg'):
+    if (pkg_mngr == 'dpkg'):
         return get_dpkg_pkg_version(pkg)
     # rpm
-    elif (tsg_info['INSTALLER'] == 'rpm'):
+    elif (pkg_mngr == 'rpm'):
         return get_rpm_pkg_version(pkg)
     else:
         return None
@@ -57,7 +85,6 @@ def get_omsconfig_version():
     pkg_version = get_package_version('omsconfig')
     if (pkg_version == None):
         # couldn't find OMSConfig
-        print("Error: could not get OMSConfig Version.")
         return None
     return pkg_version
 
@@ -68,7 +95,6 @@ def get_omi_version():
     pkg_version = get_package_version('omi')
     if (pkg_version == None):
         # couldn't find OMI
-        print("Error: could not get OMI Version.")
         return None
     return pkg_version
 
@@ -79,7 +105,6 @@ def get_scx_version():
     pkg_version = get_package_version('scx')
     if (pkg_version == None):
         # couldn't find SCX
-        print("Error: could not get SCX Version.")
         return None
     return pkg_version
 
@@ -88,12 +113,12 @@ def get_scx_version():
 # check to make sure all necessary packages are installed
 def check_packages():
     if (get_omsconfig_version() == None):
-        return False
+        return 107
 
     if (get_omi_version() == None):
-        return False
+        return 108
 
     if (get_scx_version() == None):
-        return False
+        return 109
     
-    return True
+    return 0
