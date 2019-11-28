@@ -62,6 +62,8 @@ def check_omsagent_running(workspace):
 
 
 def check_heartbeat():
+    print("CHECKING HEARTBEAT / HEALTH...")
+
     success = 0
 
     # check if installed correctly
@@ -69,6 +71,7 @@ def check_heartbeat():
     if (get_oms_version() == None):
         print_errors(110, reinstall=False)
         print("Running the installation part of the troubleshooter in order to find the issue...")
+        print("================================================================================")
         return check_installation(err_codes=False)
 
     # get workspace ID
@@ -109,6 +112,7 @@ def check_heartbeat():
         if (checked_log_hb == 125):
             print_errors(checked_log_hb, reinstall=False)
             print("Running the connection part of the troubleshooter in order to find the issue...")
+            print("================================================================================")
             return check_connection(err_codes=False)
         # other issue
         if (print_errors(checked_log_hb) == 1):

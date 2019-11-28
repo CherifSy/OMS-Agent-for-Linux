@@ -36,11 +36,11 @@ def check_internet_connect():
 
 # check agent service endpoint
 def check_agent_service_endpt():
-    dsc_endpt = get_tsginfo_key['DSC_ENDPOINT']
+    dsc_endpt = get_tsginfo_key('DSC_ENDPOINT')
     if (dsc_endpt == None):
         tsg_error_info.append(('DSC (agent service) endpoint', omsadmin_path))
         return 118
-    agent_endpt = dsc_endpt[8:]
+    agent_endpt = dsc_endpt.split('/')[2]
 
     if (check_endpt(agent_endpt)):
         return 0

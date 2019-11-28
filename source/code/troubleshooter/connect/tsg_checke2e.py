@@ -20,10 +20,11 @@ def check_e2e():
     successes = []
     failures = []
 
-    print("Please go to https://ms.portal.azure.com and navigate to your workspace. "\
+    print("--------------------------------------------------------------------------------")
+    print(" Please go to https://ms.portal.azure.com and navigate to your workspace.\n "\
           "Once there, please navigate to the 'Logs' blade, and input the queries "\
-          "that will be printed below. If the query was successful, then you should "\
-          "see one result; if not, then there will be no results.")
+          "that will be printed below.\n If the query was successful, then you should "\
+          "see one result; if not, then there will be no results.\n")
     print("WARNING: not all of these will necessarily have information! Specifically, "\
           "ApacheAccess_CL, MySQL_CL, or Custom_Log_CL will have no results if you "\
           "don't use Apache, MySQL, or Custom Logs, respectively. You can always skip "\
@@ -37,8 +38,9 @@ def check_e2e():
     if (skip_all.lower() in ['n','no']):
         for source in sources:
             query = "{0} | where Computer == '{1}' | take 1".format(source, hostname)
+            print("--------------------------------------------------------------------------------")
             print("Please run this query:")
-            print(query)
+            print("  {0}".format(query))
 
             # ask if query was successful
             q_result = input("Was the query successful? (y/n/skip): ")
@@ -86,6 +88,7 @@ def check_e2e():
         # summarize query section
         success_qs = ', '.join(successes) if (len(successes) > 0) else 'none'
         failed_qs  = ', '.join(failures)  if (len(failures) > 0)  else 'none'
+        print("--------------------------------------------------------------------------------")
         print("Successful queries: {0}".format(success_qs))
         print("Failed queries: {0}".format(failed_qs))
         

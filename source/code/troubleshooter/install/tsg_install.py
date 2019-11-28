@@ -40,6 +40,7 @@ def get_install_err_codes():
 
 # ask if user has seen installation error code
 def ask_install_error_codes():
+    print("--------------------------------------------------------------------------------")
     answer = input("Do you have an installation error code? (y/n): ")
     # TODO: add smth about where / how to see if user encountered error code in installation
     while (answer.lower() not in ['y','yes','n','no']):
@@ -124,6 +125,7 @@ def check_key():
 
 # check all packages are installed
 def check_installation(err_codes=True):
+    print("CHECKING INSTALLATION...")
     # keep track of if all tests have been successful
     success = 0
     

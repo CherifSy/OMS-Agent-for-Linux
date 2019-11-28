@@ -76,6 +76,7 @@ def comp_versions_ge(v1, v2):
 
 
 def ask_update_old_version(oms_version, curr_oms_version):
+    print("--------------------------------------------------------------------------------")
     print("You are currently running OMS Verion {0}. There is a newer version "\
           "available which may fix your issue (version {1}).".format(oms_version, curr_oms_version))
     answer = input("Do you want to update? (y/n): ")
@@ -107,14 +108,13 @@ def update_tsg_info():
         with open(conf_path, 'r') as conf_file:
             for line in conf_file:
                 parsed_line = (line.rstrip('\n')).split('=')
-                tsg_info[parsed_line[0]] = parsed_line[1]
+                tsg_info[parsed_line[0]] = '='.join(parsed_line[1:])
         return 0
     except IOError as e:
         if (e.errno == errno.EACCES):
             tsg_error_info.append((conf_path,))
             return 100
         else:
-            print("Error: could not access file {0}".format(conf_path))
             raise
 
 # get value from omsadmin.conf information in tsg_info dict

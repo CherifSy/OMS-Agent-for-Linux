@@ -39,6 +39,7 @@ def get_onboarding_err_codes():
 
 # ask if user has seen onboarding error code
 def ask_onboarding_error_codes():
+    print("--------------------------------------------------------------------------------")
     answer = input("Do you have an onboarding error code? (y/n): ")
     # TODO: add smth about where / how to see if user encountered error code in onboarding
     while (answer.lower() not in ['y','yes','n','no']):
@@ -91,6 +92,8 @@ def check_oms_running():
 
 
 def check_connection(err_codes=True):
+    print("CHECKING CONNECTION...")
+
     success = 0
 
     if (err_codes):
@@ -102,6 +105,7 @@ def check_connection(err_codes=True):
     if (get_oms_version() == None):
         print_errors(110, reinstall=False)
         print("Running the installation part of the troubleshooter in order to find the issue...")
+        print("================================================================================")
         return check_installation(err_codes=False)
 
     # check omsadmin.conf
@@ -110,6 +114,7 @@ def check_connection(err_codes=True):
     if (checked_omsadmin != 0):
         print_errors(checked_omsadmin, reinstall=False)
         print("Running the installation part of the troubleshooter in order to find the issue...")
+        print("================================================================================")
         return check_installation(err_codes=False)
 
     # check general internet connectivity
@@ -131,7 +136,7 @@ def check_connection(err_codes=True):
         return print_errors(checked_la_endpts, reinstall=False)
 
     # check if queries are successful
-    print("Checking if queries are successful (requires input)...")
+    print("Checking if queries are successful...")
     checked_e2e = check_e2e()
     if (check_e2e == 1):
         return 1

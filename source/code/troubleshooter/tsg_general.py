@@ -32,36 +32,70 @@ def unimplemented():
     print("This part of the troubleshooter is unimplemented yet, please come back later for more updates!")
 
 
+
+# run through all troubleshooting scenarios
+def check_all():
+    # 1: Install
+    checked_install = check_installation()
+    if (checked_install != 0):
+        return checked_install
+    
+    print("================================================================================")
+    # 2: Connection
+    checked_connection = check_connection()
+    if (checked_connection != 0):
+        return checked_connection
+
+    print("================================================================================")
+    # 3: Heartbeat
+    checked_hb = check_heartbeat()
+    if (checked_hb != 0):
+        return checked_hb
+
+    # TODO: fill in 4, 5, and 6 when implemented
+
+    return 0
+
+
+
+
 def run_tsg():
     # check if running as sudo
     if (not check_sudo()):
         return
 
     print("Welcome to the OMS Agent for Linux Troubleshooter! What is your issue?\n"\
+        "================================================================================\n"\
         "1: Installation failure\n"\
         "2: Agent doesn't start, can't connect to Log Analytic Services\n"\
         "3: Agent is unhealthy, heartbeat data is missing\n"\
         "4: Agent has high CPU / memory usage\n"\
         "5: Syslog isn't working\n"\
         "6: Custom logs aren't working\n"\
-        "Q: Quit troubleshooter")
+        "A: Run through all troubleshooting scenarios in order\n"\
+        "Q: Quit troubleshooter\n"\
+        "================================================================================")
     switcher = {
         '1': check_installation,
         '2': check_connection,
         '3': check_heartbeat,
         '4': unimplemented,
         '5': unimplemented,
-        '6': unimplemented
+        '6': unimplemented,
+        'A': check_all
     }
     issue = input("Please select an option: ")
-    while (issue.lower() not in ['1','2','3','4','5','6','q','quit']):
+    while (issue.lower() not in ['1','2','3','4','5','6','q','quit','a']):
         print("Unclear input. Please enter an integer corresponding with your "\
-                      "issue (1-6) to continue, or 'Q' to quit.")
+              "issue (1-6) to continue (or 'A' to run through all scenarios), or "\
+              "'Q' to quit.")
         issue = input("Please select an option: ")
     if (issue.lower() in ['q','quit']):
         print("Exiting the troubleshooter...")
         return
-    section = switcher.get(issue, lambda: "Invalid input")
+    section = switcher.get(issue.upper(), lambda: "Invalid input")
+    print("You have selected option: {0}".format(issue))
+    print("================================================================================")
     success = section()
 
     if (success == 0):
