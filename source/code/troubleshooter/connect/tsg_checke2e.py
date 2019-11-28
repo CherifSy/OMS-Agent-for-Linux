@@ -30,12 +30,12 @@ def check_e2e():
           "don't use Apache, MySQL, or Custom Logs, respectively. You can always skip "\
           "certain queries if you don't want to test them by typing 's' or 'skip'.")
     # ask if user wants to skip entire query section
-    skip_all = input("Do you want to skip this entire section (all queries)? (y/n): ")
+    skip_all = input("Do you want to continue with this section (all queries)? (y/n): ")
     while (skip_all.lower() not in ['y','yes','n','no']):
         print("Unclear input. Please type either 'y'/'yes' or 'n'/'no' to proceed.")
-        skip_all = input("Do you want to skip this entire section (all queries)? (y/n): ")
+        skip_all = input("Do you want to continue with this section (all queries)? (y/n): ")
 
-    if (skip_all.lower() in ['n','no']):
+    if (skip_all.lower() in ['y','yes']):
         for source in sources:
             query = "{0} | where Computer == '{1}' | take 1".format(source, hostname)
             print("--------------------------------------------------------------------------------")
