@@ -1,8 +1,9 @@
 import re
 import subprocess
 
+from tsg_info             import tsginfo_lookup
 from tsg_errors           import tsg_error_info, print_errors
-from install.tsg_checkoms import get_oms_version, get_tsginfo_key
+from install.tsg_checkoms import get_oms_version
 from install.tsg_install  import check_installation
 from connect.tsg_connect  import check_connection
 from .tsg_multihoming     import check_multihoming
@@ -75,7 +76,7 @@ def check_heartbeat():
         return check_installation(err_codes=False)
 
     # get workspace ID
-    workspace = get_tsginfo_key('WORKSPACE_ID')
+    workspace = tsginfo_lookup('WORKSPACE_ID')
     if (workspace == None):
         omsadmin_path = "/etc/opt/microsoft/omsagent/conf/omsadmin.conf"
         tsg_error_info.append(('Workspace ID', omsadmin_path))
@@ -95,14 +96,17 @@ def check_heartbeat():
     checked_omsagent_running = check_omsagent_running(workspace)
     if (checked_omsagent_running == 121):
         # try starting omsagent
-        print("Attempting to start omsagent...")
+        print(" Agent curently not running. Attempting to start omsagent...")
         subprocess.Popen(['/opt/microsoft/omsagent/bin/service_control', 'start'])
         checked_omsagent_running = check_omsagent_running(workspace)
     if (checked_omsagent_running != 0):
-        if (print_errors(checked_omsagent_running) == 1):
+        if (print_errors(checked_omsagent_running, restart_oms=True) == 1):
             return 1
         else:
-            success = 101
+            checked_omsagent_running = check_omsagent_running(workspace)
+            if (checked_omsagent_running != 0):
+                success = 101
+
 
     # check if omsagent.log finds any heartbeat errors
     print("Checking if omsagent.log found any errors...")

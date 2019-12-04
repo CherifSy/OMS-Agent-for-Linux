@@ -2,17 +2,10 @@
 
 import socket
 
-from tsg_info             import tsg_info
-from tsg_errors           import tsg_error_info
-from install.tsg_checkoms import get_tsginfo_key
+from tsg_info             import tsginfo_lookup
+from tsg_errors           import tsg_error_info, print_errors
 
 omsadmin_path = "/etc/opt/microsoft/omsagent/conf/omsadmin.conf"
-
-# check if is fairfax region
-def is_fairfax_region():
-    oms_endpt = get_tsginfo_key('OMS_ENDPOINT')
-    if (oms_endpt != None):
-        return ('.us' in oms_endpt)
 
 # ping specific endpoint
 def check_endpt(endpoint):
@@ -36,7 +29,7 @@ def check_internet_connect():
 
 # check agent service endpoint
 def check_agent_service_endpt():
-    dsc_endpt = get_tsginfo_key('DSC_ENDPOINT')
+    dsc_endpt = tsginfo_lookup('DSC_ENDPOINT')
     if (dsc_endpt == None):
         tsg_error_info.append(('DSC (agent service) endpoint', omsadmin_path))
         return 118
@@ -55,14 +48,20 @@ def check_agent_service_endpt():
 def check_log_analytics_endpts():
     success = 0
 
+    # get OMS endpoint to check if fairfax region
+    oms_endpt = tsginfo_lookup('OMS_ENDPOINT')
+    if (oms_endpt == None):
+        tsg_error_info.append(('OMS endpoint', omsadmin_path))
+        return 118
+
     # get workspace ID
-    workspace = get_tsginfo_key('WORKSPACE_ID')
+    workspace = tsginfo_lookup('WORKSPACE_ID')
     if (workspace == None):
-        tsg_error_info.append(('workspace ID', omsadmin_path))
+        tsg_error_info.append(('Workspace ID', omsadmin_path))
         return 118
 
     # get log analytics endpoints
-    if (is_fairfax_region()):
+    if ('.us' in oms_endpt):
         log_analytics_endpts = ["usge-jobruntimedata-prod-1.usgovtrafficmanager.net", \
             "usge-agentservice-prod-1.usgovtrafficmanager.net", "*.ods.opinsights.azure.us", \
             "*.oms.opinsights.azure.us"]

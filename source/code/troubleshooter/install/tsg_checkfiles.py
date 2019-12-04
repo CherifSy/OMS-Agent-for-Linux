@@ -2,9 +2,9 @@ import os
 import re
 import subprocess
 
-from tsg_info      import tsg_info
+from tsg_info      import tsginfo_lookup
 from tsg_errors    import tsg_error_info
-from .tsg_checkoms import comp_versions_ge, get_tsginfo_key
+from .tsg_checkoms import comp_versions_ge
 
 
 
@@ -290,7 +290,7 @@ def check_filesystem():
 
         # getting workspace id for protected files
         if (df == "wid_files.data"):
-            variables['WORKSPACE_ID'] = get_tsginfo_key('WORKSPACE_ID')
+            variables['WORKSPACE_ID'] = tsginfo_lookup('WORKSPACE_ID')
 
         # populate dictionaries with info from data files
         get_data((os.path.join(dfs_path, df)), variables, files, links, dirs)

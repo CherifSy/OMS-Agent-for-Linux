@@ -1,10 +1,10 @@
 import re
 import urllib
-import errno
 
-from tsg_info       import tsg_info
-from tsg_errors     import tsg_error_info, print_errors
-from .tsg_checkpkgs import get_package_version
+from tsg_info                import tsg_info, update_omsadmin
+from tsg_errors              import tsg_error_info, print_errors
+from connect.tsg_checkendpts import check_internet_connect
+from .tsg_checkpkgs          import get_package_version
 
 # backwards compatible input() function for Python 2 vs 3
 try:
@@ -32,15 +32,22 @@ def get_oms_version():
 
 # get most recent OMS version released
 def get_curr_oms_version():
-    doc_file = urlopen("https://raw.github.com/microsoft/OMS-Agent-for-Linux/master/docs/OMS-Agent-for-Linux.md")
-    for line in doc_file.readlines():
-        line = line.decode('utf8')
-        if line.startswith("omsagent | "):
-            parsed_line = line.split(' | ') # [package, version, description]
-            tsg_info['UPDATED_OMS_VERSION'] = parsed_line[1]
-            return parsed_line[1]
-    return None
-
+    try:
+        doc_file = urlopen("https://raw.github.com/microsoft/OMS-Agent-for-Linux/master/docs/OMS-Agent-for-Linux.md")
+        for line in doc_file.readlines():
+            line = line.decode('utf8')
+            if line.startswith("omsagent | "):
+                parsed_line = line.split(' | ') # [package, version, description]
+                tsg_info['UPDATED_OMS_VERSION'] = parsed_line[1]
+                return parsed_line[1]
+        return None
+    except IOError:
+        checked_internet = check_internet_connect()
+        if (checked_internet != 0):
+            print_errors(checked_internet, reinstall=False)
+        else:
+            print_errors(119, reinstall=False)
+        return None
 
 
 
@@ -77,60 +84,26 @@ def comp_versions_ge(v1, v2):
 
 def ask_update_old_version(oms_version, curr_oms_version):
     print("--------------------------------------------------------------------------------")
-    print("You are currently running OMS Verion {0}. There is a newer version "\
-          "available which may fix your issue (version {1}).".format(oms_version, curr_oms_version))
-    answer = input("Do you want to update? (y/n): ")
+    print(" You are currently running OMS Verion {0}. There is a newer version\n"\
+          " available which may fix your issue (version {1}).".format(oms_version, curr_oms_version))
+    answer = input(" Do you want to update? (y/n): ")
     while (answer.lower() not in ['y','yes','n','no']):
     # unknown input, ask again
-        print("Unclear input. Please type either 'y'/'yes' or 'n'/'no' to proceed.")
-        answer = input("Do you want to update? (y/n): ")
+        print(" Unclear input. Please type either 'y'/'yes' or 'n'/'no' to proceed.")
+        answer = input(" Do you want to update? (y/n): ")
     # user does want to update
     if (answer.lower() in ['y', 'yes']):
-        print("Please head to the Github link below and click on 'Download "\
-            "Latest OMS Agent for Linux ({0})' in order to update to the "\
-            "newest version:".format(tsg_info['CPU_BITS']))
-        print("https://github.com/microsoft/OMS-Agent-for-Linux")
-        print("And follow the instructions given here:")
-        print("https://github.com/microsoft/OMS-Agent-for-Linux/blob/master/"\
-                "docs/OMS-Agent-for-Linux.md#upgrade-from-a-previous-release")
+        print(" Please head to the Github link below and click on 'Download Latest OMS Agent\n"\
+              " for Linux ({0})' in order to update to the newest version:".format(tsg_info['CPU_BITS']))
+        print(" https://github.com/microsoft/OMS-Agent-for-Linux")
+        print(" And follow the instructions given here:")
+        print(" https://github.com/microsoft/OMS-Agent-for-Linux/blob/master/docs/"\
+                "OMS-Agent-for-Linux.md#upgrade-from-a-previous-release")
         return 1
     # user doesn't want to update
     elif (answer.lower() in ['n', 'no']):
-        print("Continuing on with troubleshooter...")
+        print(" Continuing on with troubleshooter...")
         return 0
-
-
-
-# update the dictionary with info in omsadmin.conf
-def update_tsg_info():
-    conf_path = "/etc/opt/microsoft/omsagent/conf/omsadmin.conf"
-    try:
-        with open(conf_path, 'r') as conf_file:
-            for line in conf_file:
-                parsed_line = (line.rstrip('\n')).split('=')
-                tsg_info[parsed_line[0]] = '='.join(parsed_line[1:])
-        return 0
-    except IOError as e:
-        if (e.errno == errno.EACCES):
-            tsg_error_info.append((conf_path,))
-            return 100
-        else:
-            raise
-
-# get value from omsadmin.conf information in tsg_info dict
-def get_tsginfo_key(k):
-    val = None
-    try:
-        val = tsg_info[k]
-    except KeyError:
-        updated_tsg_info = update_tsg_info()
-        if (updated_tsg_info != 0):
-            print_errors(updated_tsg_info, reinstall=False)
-            return None
-        val = tsg_info[k]
-    if (val == ''):
-        return None
-    return val
 
 
 
@@ -153,4 +126,4 @@ def check_oms():
         if (ask_update_old_version(oms_version, curr_oms_version) == 1):
             return 1
 
-    return update_tsg_info()
+    return update_omsadmin()

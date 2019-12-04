@@ -1,7 +1,6 @@
 import os
-import subprocess
 
-from tsg_info   import tsg_info
+from tsg_info   import tsg_info, get_os_bits, update_os_version
 from tsg_errors import tsg_error_info
 
 
@@ -65,26 +64,6 @@ def get_supported_versions():
 
 
 
-# get if machine is 32 bit or 64 bit
-def get_os_bits():
-    cpu_info = subprocess.Popen('lscpu', stdout=subprocess.PIPE, stderr=subprocess.STDOUT)\
-                .communicate()[0].decode('utf-8')
-    cpu_opmodes = (cpu_info.split('\n'))[1]
-    cpu_bits = cpu_opmodes[-6:]
-    tsg_info['CPU_BITS'] = cpu_bits
-    return cpu_bits
-
-
-# put all info from os-release in dictionary for lookup
-def get_os_version():
-    with open("/etc/os-release", 'r') as os_file:
-        for line in os_file:
-            line = line.replace('"', '')
-            info = line.split('=')
-            tsg_info['OS_' + (info[0])] = (info[1]).rstrip('\n')
-
-
-
 # print out warning if running the wrong version of OS system
 def get_alternate_versions():
     if (tsg_info['CPU_BITS'] == '32-bit'):
@@ -130,7 +109,7 @@ def check_os():
         return 102
 
     # get OS version info
-    get_os_version()
+    update_os_version()
 
     # check OS version
     return check_os_version(cpu_bits)
