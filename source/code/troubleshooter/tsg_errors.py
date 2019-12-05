@@ -74,37 +74,28 @@ def ask_reinstall():
     answer = get_input("Would you like to uninstall and reinstall OMS Agent to see if that fixes the\n"\
                         "issue you're having? (y/n)", ['y','yes','n','no'],\
                        "Please type either 'y'/'yes' or 'n'/'no' to proceed.")
-    answer = input(" : ")
-    while (answer.lower() not in ):
-        print(" Unclear input. ")
-        answer = input(" Would you like to uninstall and reinstall OMS Agent to see if "\
-                       "that fixes the \nissue you're having? (y/n): ")
-
     if (answer.lower() in ['y','yes']):
-        print(" Please run the command:")
-        print("    sudo sh ./omsagent-*.universal.x64.sh --purge")
-        print(" to uninstall, and then run the command:")
-        print("    sudo sh ./omsagent-*.universal.x64.sh --install")
-        print(" to reinstall.")
+        print("Please run the command:")
+        print("  sudo sh ./omsagent-*.universal.x64.sh --purge")
+        print("to uninstall, and then run the command:")
+        print("  sudo sh ./omsagent-*.universal.x64.sh --install")
+        print("to reinstall.")
         return 1
 
     elif (answer.lower() in ['n','no']):
-        print(" Continuing on with troubleshooter...")
+        print("Continuing on with troubleshooter...")
         return 101
 
 def ask_restart_oms():
-    answer = input(" Would you like to restart OMS Agent? (y/n): ")
-    while (answer.lower() not in ['y','yes','n','no']):
-        print(" Unclear input. Please type either 'y'/'yes' or 'n'/'no' to proceed.")
-        answer = input(" Would you like to restart OMS Agent? (y/n): ")
-
+    answer = get_input("Would you like to restart OMS Agent? (y/n)", ['y','yes','n','no'],\
+                       "Please type either 'y'/'yes' or 'n'/'no' to proceed.")
     if (answer.lower() in ['y','yes']):
-        print(" Restarting OMS Agent...")
+        print("Restarting OMS Agent...")
         subprocess.Popen(['/opt/microsoft/omsagent/bin/service_control', 'restart'])
         return 0
 
     elif (answer.lower() in ['n','no']):
-        print(" Continuing on with troubleshooter...")
+        print("Continuing on with troubleshooter...")
         return 101
 
 
