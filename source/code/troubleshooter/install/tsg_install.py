@@ -2,17 +2,11 @@ import os
 import subprocess
 
 from tsg_info        import update_pkg_manager
-from tsg_errors      import tsg_error_info, print_errors
+from tsg_errors      import tsg_error_info, get_input, print_errors
 from .tsg_checkos    import check_os
 from .tsg_checkoms   import check_oms
 from .tsg_checkfiles import check_filesystem
 from .tsg_checkpkgs  import check_packages
-
-# backwards compatible input() function for Python 2 vs 3
-try:
-    input = raw_input
-except NameError:
-    pass
 
 
 
@@ -41,31 +35,27 @@ def get_install_err_codes():
 # ask if user has seen installation error code
 def ask_install_error_codes():
     print("--------------------------------------------------------------------------------")
-    answer = input(" Do you have an installation error code? (You can find it by going through the\n"\
-                   " command output in the terminal to find a line that matches 'Shell bundle\n"\
-                   " exiting with code <error code>' (y/n): ")
-    while (answer.lower() not in ['y','yes','n','no']):
-        print(" Unclear input. Please type either 'y'/'yes' or 'n'/'no' to proceed.")
-        answer = input(" Do you have an installation error code? (y/n): ")
+    print("Installation error codes can be found by going through the command output in \n"\
+          "the terminal to find a line that matches:")
+    print("    Shell bundle exiting with code <err>")
+    answer = get_input("Do you have an installation error code? (y/n)", ['y','yes','n','no'],\
+                       "Please type either 'y'/'yes' or 'n'/'no' to proceed.")
     if (answer.lower() in ['y','yes']):
         install_err_codes = get_install_err_codes()
-        err_code = input(" Please input the error code: ")
-        while (err_code not in list(install_err_codes.keys())):
-            if (err_code == 'none'):
-                break
-            print(" Unclear input. Please enter an error code (either an integer or 'NOT_DEFINED')\n"\
-                  " to get the error message, or type 'none' to continue with the troubleshooter.")
-            err_code = input(" Please input the error code: ")
+        poss_ans = list(install_err_codes.keys()) + ['none']
+        err_code = get_input("Please input the error code", poss_ans,\
+                             "Please enter an error code (either an integer or 'NOT_DEFINED') \n"\
+                                "to get the error message, or type 'none' to continue with "\
+                                "the troubleshooter.")
         if (err_code != 'none'):
-            print(" Error {0}: {1}".format(err_code, install_err_codes[err_code]))
-            answer1 = input(" Would you like to continue with the troubleshooter? (y/n): ")
-            while (answer1.lower() not in ['y','yes','n','no']):
-                print(" Unclear input. Please type either 'y'/'yes' or 'n'/'no' to proceed.")
-                answer1 = input(" Would you like to continue with the troubleshooter? (y/n): ")
+            print("Error {0}: {1}".format(err_code, install_err_codes[err_code]))
+            answer1 = get_input("Would you like to continue with the troubleshooter? (y/n)",\
+                                ['y','yes','n','no'],
+                                "Please type either 'y'/'yes' or 'n'/'no' to proceed.")
             if (answer1.lower() in ['n','no']):
                 print("Exiting troubleshooter...")
                 return 1
-    print(" Continuing on with troubleshooter...")
+    print("Continuing on with troubleshooter...")
     return 0
 
 

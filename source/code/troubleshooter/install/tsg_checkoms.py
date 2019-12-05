@@ -2,15 +2,9 @@ import re
 import urllib
 
 from tsg_info                import tsg_info, update_omsadmin
-from tsg_errors              import tsg_error_info, print_errors
+from tsg_errors              import tsg_error_info, get_input, print_errors
 from connect.tsg_checkendpts import check_internet_connect
 from .tsg_checkpkgs          import get_package_version
-
-# backwards compatible input() function for Python 2 vs 3
-try:
-    input = raw_input
-except NameError:
-    pass
 
 # urlopen() in different packages in Python 2 vs 3
 try:
@@ -86,23 +80,20 @@ def ask_update_old_version(oms_version, curr_oms_version):
     print("--------------------------------------------------------------------------------")
     print(" You are currently running OMS Verion {0}. There is a newer version\n"\
           " available which may fix your issue (version {1}).".format(oms_version, curr_oms_version))
-    answer = input(" Do you want to update? (y/n): ")
-    while (answer.lower() not in ['y','yes','n','no']):
-    # unknown input, ask again
-        print(" Unclear input. Please type either 'y'/'yes' or 'n'/'no' to proceed.")
-        answer = input(" Do you want to update? (y/n): ")
+    answer = get_input("Do you want to update? (y/n)", ['y','yes','n','no'],\
+                       "Please type either 'y'/'yes' or 'n'/'no' to proceed.")
     # user does want to update
     if (answer.lower() in ['y', 'yes']):
-        print(" Please head to the Github link below and click on 'Download Latest OMS Agent\n"\
-              " for Linux ({0})' in order to update to the newest version:".format(tsg_info['CPU_BITS']))
-        print(" https://github.com/microsoft/OMS-Agent-for-Linux")
-        print(" And follow the instructions given here:")
-        print(" https://github.com/microsoft/OMS-Agent-for-Linux/blob/master/docs/"\
+        print("Please head to the Github link below and click on 'Download Latest OMS Agent\n"\
+              "for Linux ({0})' in order to update to the newest version:".format(tsg_info['CPU_BITS']))
+        print("  https://github.com/microsoft/OMS-Agent-for-Linux")
+        print("And follow the instructions given here:")
+        print("  https://github.com/microsoft/OMS-Agent-for-Linux/blob/master/docs/"\
                 "OMS-Agent-for-Linux.md#upgrade-from-a-previous-release")
         return 1
     # user doesn't want to update
     elif (answer.lower() in ['n', 'no']):
-        print(" Continuing on with troubleshooter...")
+        print("Continuing on with troubleshooter...")
         return 0
 
 

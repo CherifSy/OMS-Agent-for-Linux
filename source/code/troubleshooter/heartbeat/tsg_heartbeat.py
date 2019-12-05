@@ -9,12 +9,6 @@ from connect.tsg_connect  import check_connection
 from .tsg_multihoming     import check_multihoming
 from .tsg_log_hb          import check_log_heartbeat
 
-# backwards compatible input() function for Python 2 vs 3
-try:
-    input = raw_input
-except NameError:
-    pass
-
 
 
 def check_omsagent_running(workspace):
@@ -55,10 +49,6 @@ def check_omsagent_running(workspace):
 
     # none of the processes running are OMS
     return 121
-
-
-
-# TODO: ask if user wants to restart OMS - /opt/microsoft/omsagent/bin/service_control restart
 
 
 

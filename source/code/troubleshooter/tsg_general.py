@@ -1,15 +1,9 @@
 import os
 
-from tsg_errors              import print_errors
+from tsg_errors              import get_input, print_errors
 from install.tsg_install     import check_installation
 from connect.tsg_connect     import check_connection
 from heartbeat.tsg_heartbeat import check_heartbeat
-
-# backwards compatible input() function for Python 2 vs 3
-try:
-    input = raw_input
-except NameError:
-    pass
 
 # check to make sure the user is running as root
 def check_sudo():
@@ -84,12 +78,10 @@ def run_tsg():
         '6': unimplemented,
         'A': check_all
     }
+    issue = get_input("Please select an option", ['1','2','3','4','5','6','q','quit','a','all'],\
+                      "Please enter an integer corresponding with your issue (1-6) to\n"\
+                        "continue (or 'A' to run through all scenarios), or 'Q' to quit.")
     issue = input("Please select an option: ")
-    while (issue.lower() not in ['1','2','3','4','5','6','q','quit','a']):
-        print("Unclear input. Please enter an integer corresponding with your "\
-              "issue (1-6) to continue (or 'A' to run through all scenarios), or "\
-              "'Q' to quit.")
-        issue = input("Please select an option: ")
     if (issue.lower() in ['q','quit']):
         print("Exiting the troubleshooter...")
         return

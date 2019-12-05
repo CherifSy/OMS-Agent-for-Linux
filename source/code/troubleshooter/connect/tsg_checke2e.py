@@ -2,11 +2,7 @@
 
 import subprocess
 
-# backwards compatible input() function for Python 2 vs 3
-try:
-    input = raw_input
-except NameError:
-    pass
+from tsg_errors import get_input
 
 def check_e2e():
     success = 0
@@ -30,24 +26,22 @@ def check_e2e():
           " use Apache, MySQL, or Custom Logs,\n respectively. You can always skip certain\n"\
           " queries if you don't want to test them by typing 's' or 'skip'.")
     # ask if user wants to skip entire query section
-    skip_all = input(" Do you want to continue with this section (all queries)? (y/n): ")
-    while (skip_all.lower() not in ['y','yes','n','no']):
-        print(" Unclear input. Please type either 'y'/'yes' or 'n'/'no' to proceed.")
-        skip_all = input(" Do you want to continue with this section (all queries)? (y/n): ")
+    no_skip_all = get_input("Do you want to continue with this section (all queries)? (y/n)",\
+                            ['y','yes','n','no'],\
+                            "Please type either 'y'/'yes' or 'n'/'no' to proceed.")
 
-    if (skip_all.lower() in ['y','yes']):
+    if (no_skip_all.lower() in ['y','yes']):
         for source in sources:
             query = "{0} | where Computer == '{1}' | take 1".format(source, hostname)
             print("--------------------------------------------------------------------------------")
             print(" Please run this query:")
-            print("  {0}".format(query))
+            print("    {0}".format(query))
 
             # ask if query was successful
-            q_result = input(" Was the query successful? (y/n/skip): ")
-            while (q_result.lower() not in ['y','yes','n','no','s','skip']):
-                print(" Unclear input. Please type either 'y'/'yes' or 'n'/'no' to proceed,\n"\
-                      " or 's'/'skip' to skip the {0} query.".format(source))
-                q_result = input(" Was the query successful? (y/n/skip): ")
+            q_result = get_input("Was the query successful? (y/n/skip)",\
+                                 ['y','yes','n','no','s','skip'],\
+                                 "Please type either 'y'/'yes' or 'n'/'no' to proceed,\n"\
+                                    "or 's'/'skip' to skip the {0} query.".format(source))
 
             # skip current query
             if (q_result.lower() in ['s','skip']):
@@ -63,26 +57,24 @@ def check_e2e():
             elif (q_result.lower() in ['n','no']):
                 failures.append(source)
                 # ask to quit troubleshooter completely
-                quit_tsg = input(" Do you want to continue with the troubleshooter?")
-                while (quit_tsg.lower() not in ['y','yes','n','no']):
-                    print(" Unclear input. Please type either 'y'/'yes' or 'n'/'no' to proceed.")
-                    quit_tsg = input(" Do you want to continue with the troubleshooter?")
+                quit_tsg = get_input("Do you want to continue with the troubleshooter? (y/n)",\
+                                     ['y','yes','n','no'],
+                                     "Please type either 'y'/'yes' or 'n'/'no' to proceed.")
                 # quit troubleshooter
                 if (quit_tsg.lower() in ['n','no']):
                     print("Exiting troubleshooter...")
                     return 1
                 # ask to quit this section
                 elif (quit_tsg.lower() in ['y','yes']):
-                    quit_section = input(" Do you want to continue with this section?")
-                    while (quit_section.lower() not in ['y','yes','n','no']):
-                        print(" Unclear input. Please type either 'y'/'yes' or 'n'/'no' to proceed.")
-                        quit_section = input(" Do you want to continue with this section?")
+                    quit_section = get_input("Do you want to continue with this section? (y/n)",\
+                                             ['y','yes','n','no'],\
+                                             "Please type either 'y'/'yes' or 'n'/'no' to proceed.")
                     # quit section
                     if (quit_section.lower() in ['n','no']):
                         break
                     # continue queries
                     elif (quit_section.lower() in ['y','yes']):
-                        print(" Continuing to next query...")
+                        print("Continuing to next query...")
                         continue
             
         # summarize query section
@@ -95,16 +87,15 @@ def check_e2e():
         if (len(failures) > 0):
             success = 101
             # ask to quit troubleshooter completely
-            quit_tsg = input(" Do you want to continue with the troubleshooter?")
-            while (quit_tsg.lower() not in ['y','yes','n','no']):
-                print(" Unclear input. Please type either 'y'/'yes' or 'n'/'no' to proceed.")
-                quit_tsg = input(" Do you want to continue with the troubleshooter?")
+            quit_tsg = get_input("Do you want to continue with the troubleshooter? (y/n)",\
+                                 ['y','yes','n','no'],\
+                                 "Please type either 'y'/'yes' or 'n'/'no' to proceed.")
             # quit troubleshooter
             if (quit_tsg.lower() in ['n','no']):
                 print("Exiting troubleshooter...")
                 return 1
     
-    print(" Continuing on with troubleshooter...")
+    print("Continuing on with troubleshooter...")
 
     return success
                     

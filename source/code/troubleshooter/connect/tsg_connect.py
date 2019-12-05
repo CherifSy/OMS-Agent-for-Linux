@@ -1,17 +1,11 @@
 import subprocess
 
-from tsg_errors           import tsg_error_info, print_errors
+from tsg_errors           import tsg_error_info, get_input, print_errors
 from install.tsg_install  import check_installation
 from install.tsg_checkoms import get_oms_version
 from .tsg_checkendpts     import check_internet_connect, check_agent_service_endpt, \
                                  check_log_analytics_endpts
 from .tsg_checke2e        import check_e2e
-
-# backwards compatible input() function for Python 2 vs 3
-try:
-    input = raw_input
-except NameError:
-    pass
 
 
 
@@ -40,30 +34,24 @@ def get_onboarding_err_codes():
 # ask if user has seen onboarding error code
 def ask_onboarding_error_codes():
     print("--------------------------------------------------------------------------------")
-    answer = input(" Do you have an onboarding error code? (y/n): ")
     # TODO: add smth about where / how to see if user encountered error code in onboarding
-    while (answer.lower() not in ['y','yes','n','no']):
-        print(" Unclear input. Please type either 'y'/'yes' or 'n'/'no' to proceed.")
-        answer = input(" Do you have an onboarding error code? (y/n): ")
+    answer = get_input("Do you have an onboarding error code? (y/n)", ['y','yes','n','no'],\
+                       "Please type either 'y'/'yes' or 'n'/'no' to proceed.")
     if (answer.lower() in ['y','yes']):
         onboarding_err_codes = get_onboarding_err_codes()
-        err_code = input(" Please input the error code: ")
-        while (err_code not in list(onboarding_err_codes.keys())):
-            if (err_code == 'none'):
-                break
-            print(" Unclear input. Please enter an error code (an integer) to get the error\n"\
-                  " message, or type 'none' to continue with the troubleshooter.")
-            err_code = input(" Please input the error code: ")
+        poss_ans = list(onboarding_err_codes.keys()) + ['none']
+        err_code = get_input("Please input the error code", poss_ans,\
+                             "Please enter an error code (an integer) to get the error \n"\
+                                "message, or type 'none' to continue with the troubleshooter.")
         if (err_code != 'none'):
             print(" Error {0}: {1}".format(err_code, onboarding_err_codes[err_code]))
-            answer1 = input(" Would you like to continue with the troubleshooter? (y/n): ")
-            while (answer1.lower() not in ['y','yes','n','no']):
-                print(" Unclear input. Please type either 'y'/'yes' or 'n'/'no' to proceed.")
-                answer1 = input(" Would you like to continue with the troubleshooter? (y/n): ")
+            answer1 = get_input("Would you like to continue with the troubleshooter? (y/n)",\
+                                ['y','yes','n','no'],
+                                "Please type either 'y'/'yes' or 'n'/'no' to proceed.")
             if (answer1.lower() in ['n','no']):
                 print("Exiting troubleshooter...")
                 return 1
-    print(" Continuing on with troubleshooter...")
+    print("Continuing on with troubleshooter...")
     return 0
 
 

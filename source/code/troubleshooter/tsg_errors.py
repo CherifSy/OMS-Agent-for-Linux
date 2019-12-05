@@ -1,6 +1,12 @@
 import copy
 import subprocess
 
+# backwards compatible input() function for Python 2 vs 3
+try:
+    input = raw_input
+except NameError:
+    pass
+
 # error info edited when error occurs
 tsg_error_info = []
 
@@ -53,12 +59,24 @@ tsg_error_codes = {
 }  # TODO: keep up to date with error codes onenote
 
 
+# for getting inputs from the user
+def get_input(question, poss_answers, no_fit):
+    answer = input(" {1}: ".format(question))
+    while (answer.lower() not in poss_answers):
+        print("Unclear input. {0}".format(no_fit))
+        answer = input(" {1}".format(question))
+    return answer
+
+
+
 # ask user if they want to reinstall OMS Agent
 def ask_reinstall():
-    answer = input(" Would you like to uninstall and reinstall OMS Agent to see if that fixes the \n"\
-                   "issue you're having? (y/n): ")
-    while (answer.lower() not in ['y','yes','n','no']):
-        print(" Unclear input. Please type either 'y'/'yes' or 'n'/'no' to proceed.")
+    answer = get_input("Would you like to uninstall and reinstall OMS Agent to see if that fixes the\n"\
+                        "issue you're having? (y/n)", ['y','yes','n','no'],\
+                       "Please type either 'y'/'yes' or 'n'/'no' to proceed.")
+    answer = input(" : ")
+    while (answer.lower() not in ):
+        print(" Unclear input. ")
         answer = input(" Would you like to uninstall and reinstall OMS Agent to see if "\
                        "that fixes the \nissue you're having? (y/n): ")
 
@@ -91,6 +109,8 @@ def ask_restart_oms():
 
 
 def print_errors(err_code, reinstall=True, restart_oms=False):
+    if (err_code == 1):
+        return 1
     err_string = tsg_error_codes[err_code]
     # no formatting
     if (tsg_error_info == []):
