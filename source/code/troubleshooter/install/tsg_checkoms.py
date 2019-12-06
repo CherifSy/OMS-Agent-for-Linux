@@ -78,22 +78,23 @@ def comp_versions_ge(v1, v2):
 
 def ask_update_old_version(oms_version, curr_oms_version):
     print("--------------------------------------------------------------------------------")
-    print(" You are currently running OMS Verion {0}. There is a newer version\n"\
-          " available which may fix your issue (version {1}).".format(oms_version, curr_oms_version))
+    print("You are currently running OMS Verion {0}. There is a newer version\n"\
+          "available which may fix your issue (version {1}).".format(oms_version, curr_oms_version))
     answer = get_input("Do you want to update? (y/n)", ['y','yes','n','no'],\
                        "Please type either 'y'/'yes' or 'n'/'no' to proceed.")
     # user does want to update
     if (answer.lower() in ['y', 'yes']):
         print("Please head to the Github link below and click on 'Download Latest OMS Agent\n"\
               "for Linux ({0})' in order to update to the newest version:".format(tsg_info['CPU_BITS']))
-        print("  https://github.com/microsoft/OMS-Agent-for-Linux")
+        print("\n    https://github.com/microsoft/OMS-Agent-for-Linux\n")
         print("And follow the instructions given here:")
-        print("  https://github.com/microsoft/OMS-Agent-for-Linux/blob/master/docs/"\
-                "OMS-Agent-for-Linux.md#upgrade-from-a-previous-release")
+        print("\n    https://github.com/microsoft/OMS-Agent-for-Linux/blob/master/docs/"\
+                "OMS-Agent-for-Linux.md#upgrade-from-a-previous-release\n")
         return 1
     # user doesn't want to update
     elif (answer.lower() in ['n', 'no']):
         print("Continuing on with troubleshooter...")
+        print("--------------------------------------------------------------------------------")
         return 0
 
 

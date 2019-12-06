@@ -24,6 +24,7 @@ def check_sudo():
 # TODO: remove function when everything is implemented
 def unimplemented():
     print("This part of the troubleshooter is unimplemented yet, please come back later for more updates!")
+    return 0
 
 
 
@@ -81,7 +82,6 @@ def run_tsg():
     issue = get_input("Please select an option", ['1','2','3','4','5','6','q','quit','a','all'],\
                       "Please enter an integer corresponding with your issue (1-6) to\n"\
                         "continue (or 'A' to run through all scenarios), or 'Q' to quit.")
-    issue = input("Please select an option: ")
     if (issue.lower() in ['q','quit']):
         print("Exiting the troubleshooter...")
         return

@@ -14,7 +14,6 @@ tsg_error_info = []
 
 # dictionary correlating error codes to error messages
 tsg_error_codes = {
-    1   : "User requested to exit troubleshooter.",
     101 : "Please go through the output above to find the errors caught by the troubleshooter.",
     102 : "Couldn't get if CPU is 32-bit or 64-bit.",
     103 : "This version of {0} ({1}) is not supported. For {2} machines, please download {3}.",
@@ -31,10 +30,10 @@ tsg_error_codes = {
           "supports versions 1.11 and newer. Please head to the Github link below "\
           "and click on 'Download Latest OMS Agent for Linux ({1})' in order to update "\
           "to the newest version:\n"\
-          "https://github.com/microsoft/OMS-Agent-for-Linux\n"\
+          "\n    https://github.com/microsoft/OMS-Agent-for-Linux\n\n"\
           "And follow the instructions given here:\n"\
-          "https://github.com/microsoft/OMS-Agent-for-Linux/blob/master/docs"\
-          "/OMS-Agent-for-Linux.md#upgrade-from-a-previous-release .",
+          "\n    https://github.com/microsoft/OMS-Agent-for-Linux/blob/master/docs"\
+          "/OMS-Agent-for-Linux.md#upgrade-from-a-previous-release\n",
     112 : "Couldn't get most current released version of OMS.",
     113 : "{0} {1} doesn't exist.",
     114 : "{0} {1} has {2} {3} instead of {2} {4}.",
@@ -54,17 +53,18 @@ tsg_error_codes = {
     125 : "Heartbeats are failing to send data to the workspace.",
     126 : "Machine registered with more than one log analytics workspace. List of "\
           "workspaces: {0}",
-    127 : "Machine is not connected to the internet."
+    127 : "Machine is not connected to the internet.",
+    128 : "The following queries failed: {0}."
 
 }  # TODO: keep up to date with error codes onenote
 
 
 # for getting inputs from the user
 def get_input(question, poss_answers, no_fit):
-    answer = input(" {1}: ".format(question))
+    answer = input(" {0}: ".format(question))
     while (answer.lower() not in poss_answers):
         print("Unclear input. {0}".format(no_fit))
-        answer = input(" {1}".format(question))
+        answer = input(" {0}: ".format(question))
     return answer
 
 
@@ -76,15 +76,18 @@ def ask_reinstall():
                        "Please type either 'y'/'yes' or 'n'/'no' to proceed.")
     if (answer.lower() in ['y','yes']):
         print("Please run the command:")
-        print("  sudo sh ./omsagent-*.universal.x64.sh --purge")
+        print("\n    sudo sh ./omsagent-*.universal.x64.sh --purge\n")
         print("to uninstall, and then run the command:")
-        print("  sudo sh ./omsagent-*.universal.x64.sh --install")
+        print("\n    sudo sh ./omsagent-*.universal.x64.sh --install\n")
         print("to reinstall.")
         return 1
 
     elif (answer.lower() in ['n','no']):
         print("Continuing on with troubleshooter...")
+        print("--------------------------------------------------------------------------------")
         return 101
+
+
 
 def ask_restart_oms():
     answer = get_input("Would you like to restart OMS Agent? (y/n)", ['y','yes','n','no'],\
@@ -96,6 +99,7 @@ def ask_restart_oms():
 
     elif (answer.lower() in ['n','no']):
         print("Continuing on with troubleshooter...")
+        print("--------------------------------------------------------------------------------")
         return 101
 
 

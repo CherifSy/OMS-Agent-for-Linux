@@ -13,7 +13,7 @@ from .tsg_checkpkgs  import check_packages
 # get installation error codes
 def get_install_err_codes():
     install_err_codes = {0 : "No errors found"}
-    with open("install/files/Troubleshooting.md", 'r') as ts_doc:
+    with open("files/Troubleshooting.md", 'r') as ts_doc:
         section = None
         for line in ts_doc:
             line = line.rstrip('\n')
@@ -37,7 +37,7 @@ def ask_install_error_codes():
     print("--------------------------------------------------------------------------------")
     print("Installation error codes can be found by going through the command output in \n"\
           "the terminal to find a line that matches:")
-    print("    Shell bundle exiting with code <err>")
+    print("\n    Shell bundle exiting with code <err>\n")
     answer = get_input("Do you have an installation error code? (y/n)", ['y','yes','n','no'],\
                        "Please type either 'y'/'yes' or 'n'/'no' to proceed.")
     if (answer.lower() in ['y','yes']):
@@ -48,14 +48,16 @@ def ask_install_error_codes():
                                 "to get the error message, or type 'none' to continue with "\
                                 "the troubleshooter.")
         if (err_code != 'none'):
-            print("Error {0}: {1}".format(err_code, install_err_codes[err_code]))
+            print("\nError {0}: {1}\n".format(err_code, install_err_codes[err_code]))
             answer1 = get_input("Would you like to continue with the troubleshooter? (y/n)",\
                                 ['y','yes','n','no'],
                                 "Please type either 'y'/'yes' or 'n'/'no' to proceed.")
             if (answer1.lower() in ['n','no']):
                 print("Exiting troubleshooter...")
+                print("================================================================================")
                 return 1
     print("Continuing on with troubleshooter...")
+    print("--------------------------------------------------------------------------------")
     return 0
 
 

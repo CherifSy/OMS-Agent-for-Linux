@@ -266,7 +266,7 @@ def check_links(links, exist_err, perms_err):
 def check_filesystem():
     success = 0
 
-    dfs_path = "install/files/datafiles"  # path to datafiles from troubleshooter/
+    dfs_path = "files/datafiles"  # path to datafiles from troubleshooter/
 
     # create lists to track errors
     exist_err = []

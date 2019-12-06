@@ -86,7 +86,7 @@ def check_heartbeat():
     checked_omsagent_running = check_omsagent_running(workspace)
     if (checked_omsagent_running == 121):
         # try starting omsagent
-        print(" Agent curently not running. Attempting to start omsagent...")
+        print("Agent curently not running. Attempting to start omsagent...")
         subprocess.Popen(['/opt/microsoft/omsagent/bin/service_control', 'start'])
         checked_omsagent_running = check_omsagent_running(workspace)
     if (checked_omsagent_running != 0):

@@ -29,7 +29,7 @@ def is_number(s):
 # grab all supported OS from README.md
 def get_supported_versions():
     current_bits = None
-    with open("install/files/README.md") as f:
+    with open("files/README.md") as f:
         for line in f:
             # check if we're in the right section
             if (line == "### 64-bit\n"):

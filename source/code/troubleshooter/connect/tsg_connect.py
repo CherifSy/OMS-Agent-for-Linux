@@ -12,7 +12,7 @@ from .tsg_checke2e        import check_e2e
 # get onboarding error codes
 def get_onboarding_err_codes():
     onboarding_err_codes = {0 : "No errors found"}
-    with open("install/files/Troubleshooting.md", 'r') as ts_doc:
+    with open("files/Troubleshooting.md", 'r') as ts_doc:
         section = None
         for line in ts_doc:
             line = line.rstrip('\n')
@@ -44,14 +44,16 @@ def ask_onboarding_error_codes():
                              "Please enter an error code (an integer) to get the error \n"\
                                 "message, or type 'none' to continue with the troubleshooter.")
         if (err_code != 'none'):
-            print(" Error {0}: {1}".format(err_code, onboarding_err_codes[err_code]))
+            print("\nError {0}: {1}\n".format(err_code, onboarding_err_codes[err_code]))
             answer1 = get_input("Would you like to continue with the troubleshooter? (y/n)",\
                                 ['y','yes','n','no'],
                                 "Please type either 'y'/'yes' or 'n'/'no' to proceed.")
             if (answer1.lower() in ['n','no']):
                 print("Exiting troubleshooter...")
+                print("================================================================================")
                 return 1
     print("Continuing on with troubleshooter...")
+    print("--------------------------------------------------------------------------------")
     return 0
 
 
