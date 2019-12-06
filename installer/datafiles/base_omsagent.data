@@ -135,6 +135,16 @@ MAINTAINER:              'Microsoft Corporation'
 /opt/microsoft/omsagent/plugin/scom_configuration.rb;                   source/code/plugins/scom_configuration.rb;             744; root; root
 /opt/microsoft/omsagent/plugin/out_scom.rb;                             source/code/plugins/out_scom.rb;                       744; root; root
 
+/opt/microsoft/omsagent/bin/troubleshooter/omsagent_tsg;                        source/code/troubleshooter/dist/omsagent_tsg;   755; root; root
+/opt/microsoft/omsagent/bin/troubleshooter/files/README.md;                     README.md;                                      644; root; root
+/opt/microsoft/omsagent/bin/troubleshooter/files/Troubleshooting.md;            docs/Troubleshooting.md;                        644; root; root
+/opt/microsoft/omsagent/bin/troubleshooter/files/datafiles/base_omsagent.data;  installer/datafiles/base_omsagent.data;         644; root; root
+/opt/microsoft/omsagent/bin/troubleshooter/files/datafiles/linux.data;          installer/datafiles/linux.data;                 644; root; root
+/opt/microsoft/omsagent/bin/troubleshooter/files/datafiles/linux_dpkg.data;     installer/datafiles/linux_dpkg.data;            644; root; root
+/opt/microsoft/omsagent/bin/troubleshooter/files/datafiles/linux_rpm.data;      installer/datafiles/linux_rpm.data;             644; root; root
+/opt/microsoft/omsagent/bin/troubleshooter/files/datafiles/ruby.data;           installer/datafiles/ruby.data;                  644; root; root
+/opt/microsoft/omsagent/bin/troubleshooter/files/datafiles/wid_files.data;      source/code/troubleshooter/files/wid_files.data;    644; root; root
+
 %Links
 /opt/microsoft/omsagent/bin/omsagent; /opt/microsoft/omsagent/ruby/bin/fluentd; 755; root; root
 
@@ -157,6 +167,10 @@ MAINTAINER:              'Microsoft Corporation'
 /opt/microsoft/omsagent/plugin;                         755; root; root
 
 /var/opt/microsoft;                                     755; root; root; sysdir
+
+/opt/microsoft/omsagent/bin/troubleshooter;             755; root; root
+/opt/microsoft/omsagent/bin/troubleshooter/files;       755; root; root
+/opt/microsoft/omsagent/bin/troubleshooter/files/datafiles; 755; root; root
 
 %Dependencies
 
