@@ -92,10 +92,17 @@ def ask_reinstall():
 def ask_restart_oms():
     answer = get_input("Would you like to restart OMS Agent? (y/n)", ['y','yes','n','no'],\
                        "Please type either 'y'/'yes' or 'n'/'no' to proceed.")
+
     if (answer.lower() in ['y','yes']):
         print("Restarting OMS Agent...")
-        subprocess.Popen(['/opt/microsoft/omsagent/bin/service_control', 'restart'])
-        return 0
+        sc_path = '/opt/microsoft/omsagent/bin/service_control'
+        try:
+            subprocess.check_output([sc_path, 'restart'], universal_newlines=True,\
+                                    stderr=subprocess.STDOUT)
+            return 0
+        except subprocess.CalledProcessError:
+            tsg_error_info.append(('executable shell script', sc_path))
+            return 113
 
     elif (answer.lower() in ['n','no']):
         print("Continuing on with troubleshooter...")
@@ -104,8 +111,12 @@ def ask_restart_oms():
 
 
 def print_errors(err_code, reinstall=True, restart_oms=False):
+    warning = False
     if (err_code == 1):
         return 1
+    if (err_code == 124):
+        warning = True
+
     err_string = tsg_error_codes[err_code]
     # no formatting
     if (tsg_error_info == []):
@@ -115,8 +126,14 @@ def print_errors(err_code, reinstall=True, restart_oms=False):
         while (len(tsg_error_info) > 0):
             tup = tsg_error_info.pop(0)
             temp_err_string = err_string.format(*tup)
-            print("ERROR: {0}".format(temp_err_string))
+            if (warning):
+                print("WARNING: {0}".format(temp_err_string))
+            else:
+                print("ERROR: {0}".format(temp_err_string))
 
+    if (warning):
+        return 0
+        
     if (restart_oms):
         return ask_restart_oms()
     elif (reinstall):

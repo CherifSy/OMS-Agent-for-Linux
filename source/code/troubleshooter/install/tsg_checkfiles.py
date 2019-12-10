@@ -186,8 +186,8 @@ def check_dirs(dirs, exist_err, perms_err):
         # check if permissions are correct
         if (success != 113):
             # get permissions
-            ll_output = subprocess.Popen(['ls', '-l', os.path.join(d, '..')], stdout=subprocess.PIPE, \
-                            stderr=subprocess.STDOUT).communicate()[0].decode('utf-8')
+            ll_output = subprocess.check_output(['ls', '-l', os.path.join(d, '..')],\
+                            universal_newlines=True)
             # ll_info: [perms, items, user, group, size, month mod, day mod, time mod, name]
             ll_info = get_ll_dir(ll_output, d)
             perm_info = [ll_info[0]] + ll_info[2:4]
@@ -211,8 +211,7 @@ def check_files(files, exist_err, perms_err):
         # check if permissions are correct
         if (success != 113):
             # get permissions
-            ll_output = subprocess.Popen(['ls', '-l', f], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)\
-                            .communicate()[0].decode('utf-8')
+            ll_output = subprocess.check_output(['ls', '-l', f], universal_newlines=True)
             # ll_info: [perms, items, user, group, size, month mod, day mod, time mod, name]
             ll_info = ll_output.split()
             perm_info = [ll_info[0]] + ll_info[2:4]
@@ -243,12 +242,12 @@ def check_links(links, exist_err, perms_err):
                 linked_file = links[linked_file][-1]
             # get permissions
             if (os.path.isdir(linked_file)):
-                ll_output = subprocess.Popen(['ls', '-l', os.path.join(linked_file, '..')], \
-                                stdout=subprocess.PIPE, stderr=subprocess.STDOUT).communicate()[0].decode('utf-8')
+                ll_output = subprocess.check_output(['ls', '-l', os.path.join(linked_file, '..')],\
+                                universal_newlines=True)
                 ll_info = get_ll_dir(ll_output, linked_file)
             elif (os.path.isfile(linked_file)):
-                ll_output = subprocess.Popen(['ls', '-l', linked_file], stdout=subprocess.PIPE, \
-                                stderr=subprocess.STDOUT).communicate()[0].decode('utf-8')
+                ll_output = subprocess.check_output(['ls', '-l', linked_file],\
+                                universal_newlines=True)
                 ll_info = ll_output.split()
             # ll_info: [perms, items, user, group, size, month mod, day mod, time mod, name]
             perm_info = [ll_info[0]] + ll_info[2:4]

@@ -80,37 +80,68 @@ def check_space():
 def check_cert():
     crt_path = "/etc/opt/microsoft/omsagent/certs/oms.crt"
     try:
-        crt_info = subprocess.Popen(['openssl', 'x509', '-in', crt_path, '-text', '-noout'], stdout=subprocess.PIPE, \
-                    stderr=subprocess.STDOUT).communicate()[0].decode('utf8')
+        crt_info = subprocess.check_output(['openssl','x509','-in',crt_path,'-text','-noout'],\
+                        universal_newlines=True, stderr=subprocess.STDOUT)
         if (crt_info.startswith("Certificate:\n")):
             return 0
         tsg_error_info.append((crt_path,))
         return 115
-    except IOError as e:
-        if (e.errno == errno.EACCES):
-            # permissions error, needs to be run as sudo
-            tsg_error_info.append((crt_path,))
-            return 100
+    except e:
+        if (e == subprocess.CalledProcessError):
+            err_msg = "Can't open {0} for reading, (\b+)".format(crt_path)
+            match_err = re.match(err_msg, (e.split('\n'))[0])
+            if (match_err != None):
+                err = (match_err.groups())[0]
+                # openssl permissions error
+                if (err == "Permission denied"):
+                    tsg_error_info.append((crt_path,))
+                    return 100
+                # openssl file existence error
+                elif (err == "No such file or directory"):
+                    tsg_error_info.append(("file", crt_path))
+                    return 113
+                # openssl some other error
+                else:
+                    tsg_error_info.append((crt_path, err))
+                    return 122
+            # catch-all in case of fluke error
+            else:
+                tsg_error_info.append((crt_path, e.output))
+                return 122
         else:
-            raise
+            tsg_error_info.append((crt_path,))
+            return 115
+
+
 
 # check RSA private key
 def check_key():
     key_path = "/etc/opt/microsoft/omsagent/certs/oms.key"
-    try:
-        key_info = subprocess.Popen(['openssl', 'rsa', '-in', key_path, '-check'], stdout=subprocess.PIPE, \
-                    stderr=subprocess.STDOUT).communicate()[0].decode('utf8')
-        if ("RSA key ok\n" in key_info):
-            return 0
-        tsg_error_info.append((key_path,))
-        return 116
-    except IOError as e:
-        if (e.errno == errno.EACCES):
-            # permissions error, needs to be run as sudo
+    key_info = subprocess.check_output(['openssl','rsa','-in',key_path,'-check'],\
+                    universal_newlines=True, stderr=subprocess.STDOUT)
+    # check if successful
+    if ("RSA key ok\n" in key_info):
+        return 0
+    # check if file access error
+    err_msg = "Can't open {0} for reading, (\b+)".format(key_path)
+    match_err = re.match(err_msg, (key_info.split('\n'))[0])
+    if (match_err != None):
+        err = (match_err.groups())[0]
+        # openssl permissions error
+        if (err == "Permission denied"):
             tsg_error_info.append((key_path,))
             return 100
+        # openssl file existence error
+        elif (err == "No such file or directory"):
+            tsg_error_info.append(("file", key_path))
+            return 113
+        # openssl some other error
         else:
-            raise
+            tsg_error_info.append((key_path, err))
+            return 122
+    # key error
+    tsg_error_info.append((key_path,))
+    return 116
 
 
 

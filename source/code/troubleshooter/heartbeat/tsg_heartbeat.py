@@ -13,8 +13,7 @@ from .tsg_log_hb          import check_log_heartbeat
 
 def check_omsagent_running(workspace):
     # check if OMS is running through 'ps'
-    processes = subprocess.Popen(['ps', '-ef'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)\
-                                .communicate()[0].decode('utf8').split('\n')
+    processes = subprocess.check_output(['ps', '-ef'], universal_newlines=True).split('\n')
     for process in processes:
         # check if process is OMS
         if (not process.startswith('omsagent')):
@@ -49,6 +48,16 @@ def check_omsagent_running(workspace):
 
     # none of the processes running are OMS
     return 121
+
+def start_omsagent(workspace):
+    sc_path = '/opt/microsoft/omsagent/bin/service_control'
+    try:
+        subprocess.check_output([sc_path, 'start'], universal_newlines=True,\
+                                stderr=subprocess.STDOUT)
+        return check_omsagent_running(workspace)
+    except subprocess.CalledProcessError:
+        tsg_error_info.append(('executable shell script', sc_path))
+        return 113
 
 
 
@@ -87,8 +96,7 @@ def check_heartbeat():
     if (checked_omsagent_running == 121):
         # try starting omsagent
         print("Agent curently not running. Attempting to start omsagent...")
-        subprocess.Popen(['/opt/microsoft/omsagent/bin/service_control', 'start'])
-        checked_omsagent_running = check_omsagent_running(workspace)
+        checked_omsagent_running = start_omsagent(workspace)
     if (checked_omsagent_running != 0):
         if (print_errors(checked_omsagent_running, restart_oms=True) == 1):
             return 1

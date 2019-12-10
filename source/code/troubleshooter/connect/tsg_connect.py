@@ -74,13 +74,6 @@ def check_omsadmin():
 
 
 
-# Verify omsagent is running using 'ps aux'
-def check_oms_running():
-    subprocess.Popen(['ps', 'aux'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)\
-                     .communicate()[0].decode('utf8')
-
-
-
 def check_connection(err_codes=True):
     print("CHECKING CONNECTION...")
 

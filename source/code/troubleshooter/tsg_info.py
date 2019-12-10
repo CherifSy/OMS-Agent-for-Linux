@@ -22,8 +22,7 @@ def tsginfo_lookup(key):
 
 # CPU Bits
 def get_os_bits():
-    cpu_info = subprocess.Popen('lscpu', stdout=subprocess.PIPE, stderr=subprocess.STDOUT)\
-                .communicate()[0].decode('utf-8')
+    cpu_info = subprocess.check_output(['lscpu'], universal_newlines=True)
     cpu_opmodes = (cpu_info.split('\n'))[1]
     cpu_bits = cpu_opmodes[-6:]
     tsg_info['CPU_BITS'] = cpu_bits
@@ -51,13 +50,11 @@ def update_os_version():
 
 # Package Manager
 def update_pkg_manager():
-    is_dpkg = subprocess.Popen(['which', 'dpkg'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)\
-                .communicate()[0].decode('utf8')
+    is_dpkg = subprocess.check_output(['which', 'dpkg'], universal_newlines=True)
     if (is_dpkg != ''):
         tsg_info['PKG_MANAGER'] = 'dpkg'
         return 0
-    is_rpm = subprocess.Popen(['which', 'rpm'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)\
-                .communicate()[0].decode('utf8')
+    is_rpm = subprocess.check_output(['which', 'rpm'], universal_newlines=True)
     if (is_rpm != ''):
         tsg_info['PKG_MANAGER'] = 'rpm'
         return 0
@@ -66,42 +63,45 @@ def update_pkg_manager():
 
 # Package Info
 def get_dpkg_pkg_version(pkg):
-    dpkg_info = subprocess.Popen(['dpkg', '-s', pkg], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)\
-                    .communicate()[0].decode('utf-8')
-    dpkg_lines = dpkg_info.split('\n')
-    if ("package '{0}' is not installed".format(pkg) in dpkg_lines[0]):
-        # didn't find package
+    try:
+        dpkg_info = subprocess.check_output(['dpkg', '-s', pkg], universal_newlines=True,\
+                                            stderr=subprocess.STDOUT)
+        dpkg_lines = dpkg_info.split('\n')
+        for line in dpkg_lines:
+            if (line.startswith('Package: ') and not line.endswith(pkg)):
+                # wrong package
+                return None
+            if (line.startswith('Status: ') and not line.endswith('installed')):
+                # not properly installed
+                return None
+            if (line.startswith('Version: ')):
+                version = (line.split())[-1]
+                tsg_info['{0}_VERSION'.format(pkg.upper())] = version
+                return version
         return None
-    for line in dpkg_lines:
-        if (line.startswith('Package: ') and not line.endswith(pkg)):
-            # wrong package
-            return None
-        if (line.startswith('Status: ') and not line.endswith('installed')):
-            # not properly installed
-            return None
-        if (line.startswith('Version: ')):
-            version = (line.split())[-1]
-            tsg_info['{0}_VERSION'.format(pkg.upper())] = version
-            return version
-    return None
+    except subprocess.CalledProcessError:
+        return None
 
 def get_rpm_pkg_version(pkg):
-    rpm_info = subprocess.Popen(['rpm', '-qi', pkg], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)\
-                .communicate()[0].decode('utf-8')
-    if ("package {0} is not installed".format(pkg) in rpm_info):
-        # didn't find package
-        return None
-    rpm_lines = rpm_info.split('\n')
-    for line in rpm_lines:
-        if (line.startswith('Name') and not line.endswith(pkg)):
-            # wrong package
+    try:
+        rpm_info = subprocess.check_output(['rpm', '-qi', pkg], universal_newlines=True,\
+                                            stderr=subprocess.STDOUT)
+        if ("package {0} is not installed".format(pkg) in rpm_info):
+            # didn't find package
             return None
-        if (line.startswith('Version')):
-            parsed_line = line.replace(' ','').split(':')  # ['Version', version]
-            version = parsed_line[1]
-            tsg_info['{0}_VERSION'.format(pkg.upper())] = version
-            return version
-    return None
+        rpm_lines = rpm_info.split('\n')
+        for line in rpm_lines:
+            if (line.startswith('Name') and not line.endswith(pkg)):
+                # wrong package
+                return None
+            if (line.startswith('Version')):
+                parsed_line = line.replace(' ','').split(':')  # ['Version', version]
+                version = parsed_line[1]
+                tsg_info['{0}_VERSION'.format(pkg.upper())] = version
+                return version
+        return None
+    except subprocess.CalledProcessError:
+        return None
 
 # omsadmin.conf
 def update_omsadmin():

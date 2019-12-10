@@ -8,8 +8,7 @@ def check_e2e():
     success = 0
 
     # get machine's hostname
-    hostname = subprocess.Popen(['hostname'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)\
-                .communicate()[0].decode('utf8').rstrip('\n')
+    hostname = subprocess.check_output(['hostname'], universal_newlines=True).rstrip('\n')
 
     sources = ['Heartbeat', 'Syslog', 'Perf', 'ApacheAccess_CL', 'MySQL_CL', 'Custom_Log_CL']
 
