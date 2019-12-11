@@ -1,3 +1,4 @@
+import os
 import subprocess
 
 from tsg_errors           import tsg_error_info, get_input, print_errors
@@ -35,18 +36,19 @@ def get_onboarding_err_codes():
 def ask_onboarding_error_codes():
     print("--------------------------------------------------------------------------------")
     # TODO: add smth about where / how to see if user encountered error code in onboarding
-    answer = get_input("Do you have an onboarding error code? (y/n)", ['y','yes','n','no'],\
+    answer = get_input("Do you have an onboarding error code? (y/n)",\
+                       (lambda x : x in ['y','yes','n','no']),\
                        "Please type either 'y'/'yes' or 'n'/'no' to proceed.")
     if (answer.lower() in ['y','yes']):
         onboarding_err_codes = get_onboarding_err_codes()
-        poss_ans = list(onboarding_err_codes.keys()) + ['none']
+        poss_ans = lambda x : x in (list(onboarding_err_codes.keys()) + ['none'])
         err_code = get_input("Please input the error code", poss_ans,\
                              "Please enter an error code (an integer) to get the error \n"\
                                 "message, or type 'none' to continue with the troubleshooter.")
         if (err_code != 'none'):
             print("\nError {0}: {1}\n".format(err_code, onboarding_err_codes[err_code]))
             answer1 = get_input("Would you like to continue with the troubleshooter? (y/n)",\
-                                ['y','yes','n','no'],
+                                (lambda x : x in ['y','yes','n','no']),
                                 "Please type either 'y'/'yes' or 'n'/'no' to proceed.")
             if (answer1.lower() in ['n','no']):
                 print("Exiting troubleshooter...")
@@ -61,16 +63,18 @@ def ask_onboarding_error_codes():
 # Verify omsadmin.conf exists / not empty
 def check_omsadmin():
     omsadmin_path = "/opt/microsoft/omsagent/bin/omsadmin.sh"
-    try:
-        with open(omsadmin_path) as omsadmin_file:
-            if (omsadmin_file == ""):
-                tsg_error_info.append((omsadmin_path,))
-                # TODO: copy contents into it upon asking?
-                return 117
-            return 0
-    except IOError:
+    # check if exists
+    if (not os.path.isfile(omsadmin_path)):
         tsg_error_info.append(('file', omsadmin_path))
         return 113
+    # check if not empty
+    if (os.stat(omsadmin_path).st_size == 0):
+        tsg_error_info.append((omsadmin_path,))
+        # TODO: copy contents into it upon asking?
+        return 117
+    # all good
+    return 0
+        
 
 
 

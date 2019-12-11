@@ -79,7 +79,8 @@ def run_tsg():
         '6': unimplemented,
         'A': check_all
     }
-    issue = get_input("Please select an option", ['1','2','3','4','5','6','q','quit','a','all'],\
+    issue = get_input("Please select an option",\
+                      (lambda x : x in ['1','2','3','4','5','6','q','quit','a','all']),\
                       "Please enter an integer corresponding with your issue (1-6) to\n"\
                         "continue (or 'A' to run through all scenarios), or 'Q' to quit.")
     if (issue.lower() in ['q','quit']):

@@ -38,11 +38,12 @@ def ask_install_error_codes():
     print("Installation error codes can be found by going through the command output in \n"\
           "the terminal to find a line that matches:")
     print("\n    Shell bundle exiting with code <err>\n")
-    answer = get_input("Do you have an installation error code? (y/n)", ['y','yes','n','no'],\
+    answer = get_input("Do you have an installation error code? (y/n)",\
+                       (lambda x : x in ['y','yes','n','no']),\
                        "Please type either 'y'/'yes' or 'n'/'no' to proceed.")
     if (answer.lower() in ['y','yes']):
         install_err_codes = get_install_err_codes()
-        poss_ans = list(install_err_codes.keys()) + ['none']
+        poss_ans = lambda x : x in (list(install_err_codes.keys()) + ['none'])
         err_code = get_input("Please input the error code", poss_ans,\
                              "Please enter an error code (either an integer or 'NOT_DEFINED') \n"\
                                 "to get the error message, or type 'none' to continue with "\
@@ -50,7 +51,7 @@ def ask_install_error_codes():
         if (err_code != 'none'):
             print("\nError {0}: {1}\n".format(err_code, install_err_codes[err_code]))
             answer1 = get_input("Would you like to continue with the troubleshooter? (y/n)",\
-                                ['y','yes','n','no'],
+                                (lambda x : x in ['y','yes','n','no']),
                                 "Please type either 'y'/'yes' or 'n'/'no' to proceed.")
             if (answer1.lower() in ['n','no']):
                 print("Exiting troubleshooter...")

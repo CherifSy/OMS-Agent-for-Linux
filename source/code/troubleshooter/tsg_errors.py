@@ -54,15 +54,22 @@ tsg_error_codes = {
     126 : "Machine registered with more than one log analytics workspace. List of "\
           "workspaces: {0}",
     127 : "Machine is not connected to the internet.",
-    128 : "The following queries failed: {0}."
+    128 : "The following queries failed: {0}.",
+    129 : "Syslog collection is set up for workspace {0}, but OMS is set up with "\
+          "workspace {1}.",
+    130 : "With protocol type {0}, ports need to be preceded by '{1}', but currently "\
+          "are preceded by '{2}'. Please see {3} for the issue.",
+    131 : "Syslog is set up to bind to port {0}, but is currently sending to port {1}. "\
+          "Please see {2} for the issue.",
+    132 : "Issue with setting up ports for syslog. Please see {0} and {1} for the issue."
 
 }  # TODO: keep up to date with error codes onenote
 
 
 # for getting inputs from the user
-def get_input(question, poss_answers, no_fit):
+def get_input(question, check_ans, no_fit):
     answer = input(" {0}: ".format(question))
-    while (answer.lower() not in poss_answers):
+    while (not check_ans(answer.lower())):
         print("Unclear input. {0}".format(no_fit))
         answer = input(" {0}: ".format(question))
     return answer
@@ -72,7 +79,7 @@ def get_input(question, poss_answers, no_fit):
 # ask user if they want to reinstall OMS Agent
 def ask_reinstall():
     answer = get_input("Would you like to uninstall and reinstall OMS Agent to see if that fixes the\n"\
-                        "issue you're having? (y/n)", ['y','yes','n','no'],\
+                        "issue you're having? (y/n)", (lambda x : x in ['y','yes','n','no']),\
                        "Please type either 'y'/'yes' or 'n'/'no' to proceed.")
     if (answer.lower() in ['y','yes']):
         print("Please run the command:")
@@ -90,7 +97,8 @@ def ask_reinstall():
 
 
 def ask_restart_oms():
-    answer = get_input("Would you like to restart OMS Agent? (y/n)", ['y','yes','n','no'],\
+    answer = get_input("Would you like to restart OMS Agent? (y/n)",\
+                       (lambda x : x in ['y','yes','n','no']),\
                        "Please type either 'y'/'yes' or 'n'/'no' to proceed.")
 
     if (answer.lower() in ['y','yes']):
