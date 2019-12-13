@@ -36,7 +36,7 @@ def parse_syslogconf():
 def check_port(port, sys_bind, sys_pt):
     oms_version = get_oms_version()
     if (oms_version == None):
-        return 110
+        return 111
 
     # get number of '@'s in front of port
     corr_pt = None
@@ -50,7 +50,7 @@ def check_port(port, sys_bind, sys_pt):
     # verify protocol type is valid
     if (corr_pt = None):
         tsg_error_info.append(("protocol type",syslogconf_path))
-        return 118
+        return 119
 
     # 95-omsagent.conf is sending to right port
     corr_port = corr_pt + sys_bind
@@ -62,7 +62,7 @@ def check_port(port, sys_bind, sys_pt):
     if (pt_count != corr_pt_count):
         pt = port[:pt_count]
         tsg_error_info.append((sys_pt, corr_pt, pt, omsagent95_path))
-        return 130
+        return 131
     # wrong port
     curr_bind = (port[pt_count+1:]).split(':')[0]
     if (curr_bind != sys_bind):
@@ -80,7 +80,7 @@ def check_omsagent95(sys_bind, sys_pt):
     workspace = tsginfo_lookup('WORKSPACE_ID')
     if (workspace == None):
         tsg_error_info.append(('Workspace ID', omsadmin_path))
-        return 118
+        return 119
 
     # set up regex lines
     comment_line = "# OMS Syslog collection for workspace (\S+)"
@@ -102,7 +102,7 @@ def check_omsagent95(sys_bind, sys_pt):
             syslog_wkspc = (match_comment.groups())[0]
             if (workspace != syslog_wkspc):
                 tsg_error_info.append((syslog_wkspc,workspace,syslogconf_path))
-                return 129
+                return 130
             else:
                 continue
 
@@ -128,23 +128,23 @@ def check_conf_files():
     # verify syslog.conf exists / not empty
     if (not os.path.isfile(syslogconf_path)):
         tsg_error_info.append(('file',syslogconf_path))
-        return 113
+        return 114
     if (os.stat(syslogconf_path).st_size == 0):
         tsg_error_info.append((syslogconf_path,))
-        return 117
+        return 118
     # verify 95-omsagent.conf exists / not empty
     if (not os.path.isfile(omsagent95_path)):
         tsg_error_info.append(('file',omsagent95_path))
-        return 113
+        return 114
     if (os.stat(omsagent95_path).st_size == 0):
         tsg_error_info.append((omsagent95_path,))
-        return 117
+        return 118
 
     # parse syslog.conf
     syslogconf_dict = parse_syslogconf()
     if (not syslogconf_dict):
         tsg_error_info.append(("syslog configuration info",syslogconf_path))
-        return 118
+        return 119
 
     # get info for checking 95-omsagent.conf
     try:
@@ -152,7 +152,7 @@ def check_conf_files():
         sys_pt = syslogconf_dict['protocol_type']
     except KeyError:
         tsg_error_info.append(("syslog configuration info",syslogconf_path))
-        return 118
+        return 119
 
     # check with 95-omsagent.conf
     return check_omsagent95(sys_bind, sys_pt)

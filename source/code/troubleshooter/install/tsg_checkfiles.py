@@ -143,21 +143,21 @@ def check_permissions(f, perm_info, corr_info, typ, perms_err):
     corr_user = corr_info[1]
     if ((perm_user != corr_user) and (perm_user != 'omsagent')):
         perms_err.append((typ, f, 'user', perm_user, corr_user))
-        success = 114
+        success = 115
     
     # check group
     perm_group = perm_info[2]
     corr_group = corr_info[2]
     if ((perm_group != corr_group) and (perm_group != 'omiusers')):
         perms_err.append((typ, f, 'group', perm_group, corr_group))
-        success = 114
+        success = 115
     
     # check permissions
     perms = (perm_info[0])[1:]
     corr_perms = perm_oct_to_symb(corr_info[0])
     if (perms != corr_perms):
         perms_err.append((typ, f, 'permissions', perms, corr_perms))
-        success = 114
+        success = 115
     return success
     
 
@@ -181,10 +181,10 @@ def check_dirs(dirs, exist_err, perms_err):
         elif (not os.path.isdir(d)):
             missing_dirs += d
             exist_err.append(('directory', d))
-            success = 113
+            success = 114
             continue
         # check if permissions are correct
-        if (success != 113):
+        if (success != 114):
             # get permissions
             ll_output = subprocess.check_output(['ls', '-l', os.path.join(d, '..')],\
                             universal_newlines=True)
@@ -193,7 +193,7 @@ def check_dirs(dirs, exist_err, perms_err):
             perm_info = [ll_info[0]] + ll_info[2:4]
             corr_info = dirs[d]
             if (check_permissions(d, perm_info, corr_info, "directory", perms_err) != 0):
-                success = 114
+                success = 115
     return success
 
 
@@ -206,10 +206,10 @@ def check_files(files, exist_err, perms_err):
         # check if file exists
         if (not os.path.isfile(f)):
             exist_err.append(('file', f))
-            success = 113
+            success = 114
             continue
         # check if permissions are correct
-        if (success != 113):
+        if (success != 114):
             # get permissions
             ll_output = subprocess.check_output(['ls', '-l', f], universal_newlines=True)
             # ll_info: [perms, items, user, group, size, month mod, day mod, time mod, name]
@@ -217,7 +217,7 @@ def check_files(files, exist_err, perms_err):
             perm_info = [ll_info[0]] + ll_info[2:4]
             corr_info = files[f]
             if (check_permissions(f, perm_info, corr_info, "file", perms_err) != 0):
-                success = 114
+                success = 115
     return success
 
             
@@ -232,10 +232,10 @@ def check_links(links, exist_err, perms_err):
         # check if link exists
         if (not os.path.islink(l)):
             exist_err.append(('link', l))
-            success = 113
+            success = 114
             continue
         # check if permissions are correct
-        if (success != 113):
+        if (success != 114):
             linked_file = links[l][-1]
             # in case a link points to a link
             while (os.path.islink(linked_file)):
@@ -253,7 +253,7 @@ def check_links(links, exist_err, perms_err):
             perm_info = [ll_info[0]] + ll_info[2:4]
             corr_info = links[l][:-1]
             if (check_permissions(l, perm_info, corr_info, "link", perms_err) != 0):
-                success = 114
+                success = 115
     return success
 
 
@@ -300,17 +300,17 @@ def check_filesystem():
         checked_links = check_links(links, exist_err, perms_err)
 
         # some paths are missing
-        if (113 in [checked_dirs, checked_files, checked_links]):
-            success = 113
-
-        # some paths have incorrect permissions
-        elif ((114 in [checked_dirs, checked_files, checked_links]) and (success != 113)):
+        if (114 in [checked_dirs, checked_files, checked_links]):
             success = 114
 
+        # some paths have incorrect permissions
+        elif ((115 in [checked_dirs, checked_files, checked_links]) and (success != 114)):
+            success = 115
+
     # update errors
-    if (success == 113):
-        tsg_error_info = exist_err
-    elif (success == 114):
-        tsg_error_info = perms_err
+    if (success == 114):
+        tsg_error_info += exist_err
+    elif (success == 115):
+        tsg_error_info += perms_err
 
     return success

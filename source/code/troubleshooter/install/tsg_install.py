@@ -72,7 +72,7 @@ def check_space():
         free_space = space.f_bavail * space.f_frsize / 1024 / 1024
         if (free_space < 500):
             tsg_error_info.append((dirname, free_space))
-            success = 105
+            success = 106
     return success
 
 
@@ -86,7 +86,7 @@ def check_cert():
         if (crt_info.startswith("Certificate:\n")):
             return 0
         tsg_error_info.append((crt_path,))
-        return 115
+        return 116
     except e:
         if (e == subprocess.CalledProcessError):
             err_msg = "Can't open {0} for reading, (\b+)".format(crt_path)
@@ -100,18 +100,18 @@ def check_cert():
                 # openssl file existence error
                 elif (err == "No such file or directory"):
                     tsg_error_info.append(("file", crt_path))
-                    return 113
+                    return 114
                 # openssl some other error
                 else:
                     tsg_error_info.append((crt_path, err))
-                    return 122
+                    return 123
             # catch-all in case of fluke error
             else:
                 tsg_error_info.append((crt_path, e.output))
-                return 122
+                return 123
         else:
             tsg_error_info.append((crt_path,))
-            return 115
+            return 116
 
 
 
@@ -135,14 +135,14 @@ def check_key():
         # openssl file existence error
         elif (err == "No such file or directory"):
             tsg_error_info.append(("file", key_path))
-            return 113
+            return 114
         # openssl some other error
         else:
             tsg_error_info.append((key_path, err))
-            return 122
+            return 123
     # key error
     tsg_error_info.append((key_path,))
-    return 116
+    return 117
 
 
 

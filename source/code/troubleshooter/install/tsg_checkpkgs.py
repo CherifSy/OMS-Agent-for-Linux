@@ -49,12 +49,12 @@ def get_scx_version():
 # check to make sure all necessary packages are installed
 def check_packages():
     if (get_omsconfig_version() == None):
-        return 107
-
-    if (get_omi_version() == None):
         return 108
 
-    if (get_scx_version() == None):
+    if (get_omi_version() == None):
         return 109
+
+    if (get_scx_version() == None):
+        return 110
     
     return 0

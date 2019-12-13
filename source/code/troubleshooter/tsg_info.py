@@ -29,7 +29,37 @@ def get_os_bits():
     return cpu_bits
 
 # OS Info
-def update_os_version():
+def get_os_version():
+    # get vm info
+    try:
+        (vm_dist, vm_ver, vm_id) = platform.linux_distribution()
+    except AttributeError:
+        (vm_dist, vm_ver, vm_id) = platform.dist()
+    # if above didn't work, get vm info through os_release
+    if (not vm_dist and not vm_ver):
+        try:
+            with open('/etc/os-release', 'r') as os_file:
+                for line in os_file:
+                    parsed_line = line.split('=')
+                    if (parsed_line[0] == 'ID'):
+                        vm_dist = (parsed_line[1].split('-'))[0]
+                        vm_dist = (vm_dist.replace('\"','')).replace('\n','')
+                    elif (parsed_line[0] == 'VERSION_ID'):
+                        vm_ver = (parsed_line[1].split('.'))[0]
+                        vm_ver = (vm_dist.replace('\"','')).replace('\n','')
+        except:
+            return None
+
+    # update tsg_info with 
+    tsg_info['OS_ID'] = vm_dist
+    tsg_info['OS_VERSION_ID'] = vm_ver
+    return (vm_dist, vm_ver)
+
+
+
+
+
+
     os_path = '/etc/os-release'
     try:
         with open(os_path, 'r') as os_file:
@@ -44,7 +74,7 @@ def update_os_version():
             return 100
         elif (e.errno == errno.ENOENT):
             tsg_error_info.append(('file', os_path))
-            return 113
+            return 114
         else:
             raise
 
@@ -59,7 +89,7 @@ def update_pkg_manager():
         tsg_info['PKG_MANAGER'] = 'rpm'
         return 0
     # neither
-    return 106
+    return 107
 
 # Package Info
 def get_dpkg_pkg_version(pkg):
@@ -118,7 +148,7 @@ def update_omsadmin():
             return 100
         elif (e.errno == errno.ENOENT):
             tsg_error_info.append(('file', os_path))
-            return 113
+            return 114
         else:
             raise
 
@@ -131,9 +161,9 @@ def update_tsginfo_all():
     if (bits not in ['32-bit', '64-bit']):
         return 102
     # os info
-    os = update_os_version()
-    if (os != 0):
-        return os
+    os = get_os_version()
+    if (os == None):
+        return 105
     # package manager
     pkg = update_pkg_manager()
     if (pkg != 0):
@@ -141,23 +171,23 @@ def update_tsginfo_all():
     # dpkg packages
     if (tsg_info['PKG_MANAGER'] == 'dpkg'):
         if (get_dpkg_pkg_version('omsconfig') == None):
-            return 107
-        if (get_dpkg_pkg_version('omi') == None):
             return 108
-        if (get_dpkg_pkg_version('scx') == None):
+        if (get_dpkg_pkg_version('omi') == None):
             return 109
-        if (get_dpkg_pkg_version('omsagent') == None):
+        if (get_dpkg_pkg_version('scx') == None):
             return 110
+        if (get_dpkg_pkg_version('omsagent') == None):
+            return 111
     # rpm packages
     elif (tsg_info['PKG_MANAGER'] == 'rpm'):
         if (get_rpm_pkg_version('omsconfig') == None):
-            return 107
-        if (get_rpm_pkg_version('omi') == None):
             return 108
-        if (get_rpm_pkg_version('scx') == None):
+        if (get_rpm_pkg_version('omi') == None):
             return 109
-        if (get_rpm_pkg_version('omsagent') == None):
+        if (get_rpm_pkg_version('scx') == None):
             return 110
+        if (get_rpm_pkg_version('omsagent') == None):
+            return 111
     # omsadmin info
     omsadmin = update_omsadmin()
     if (omsadmin != 0):

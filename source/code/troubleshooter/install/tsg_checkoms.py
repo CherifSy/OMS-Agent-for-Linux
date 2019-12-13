@@ -40,7 +40,7 @@ def get_curr_oms_version():
         if (checked_internet != 0):
             print_errors(checked_internet, reinstall=False)
         else:
-            print_errors(119, reinstall=False)
+            print_errors(120, reinstall=False)
         return None
 
 
@@ -73,8 +73,8 @@ def comp_versions_ge(v1, v2):
             return all([(i>=j) for i,j in zip(v1_nums, v2_nums)])
     # check if subversion is newer (e.g. 1.11.3 to 1.11)
     return (len(v1_split) >= len(v2_split))
-
-
+    
+    
 
 def ask_update_old_version(oms_version, curr_oms_version):
     print("--------------------------------------------------------------------------------")
@@ -102,17 +102,17 @@ def ask_update_old_version(oms_version, curr_oms_version):
 def check_oms():
     oms_version = get_oms_version()
     if (oms_version == None):
-        return 110
+        return 111
 
     # check if version is >= 1.11
     if (not comp_versions_ge(oms_version, '1.11')):
         tsg_error_info.append((oms_version, tsg_info['CPU_BITS']))
-        return 111
+        return 112
 
     # if not most updated version, ask if want to update
     curr_oms_version = get_curr_oms_version()
     if (curr_oms_version == None):
-        return 112
+        return 113
 
     if (not comp_versions_ge(oms_version, curr_oms_version)):
         if (ask_update_old_version(oms_version, curr_oms_version) == 1):

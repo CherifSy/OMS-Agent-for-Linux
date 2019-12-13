@@ -66,22 +66,22 @@ def check_omsadmin():
     # check if exists
     if (not os.path.isfile(omsadmin_path)):
         tsg_error_info.append(('file', omsadmin_path))
-        return 113
+        return 114
     # check if not empty
     if (os.stat(omsadmin_path).st_size == 0):
         tsg_error_info.append((omsadmin_path,))
         # TODO: copy contents into it upon asking?
-        return 117
+        return 118
     # all good
     return 0
         
 
 
 
-def check_connection(err_codes=True):
+def check_connection(err_codes=True, prev_success=0):
     print("CHECKING CONNECTION...")
 
-    success = 0
+    success = prev_success
 
     if (err_codes):
         if (ask_onboarding_error_codes() == 1):
@@ -90,46 +90,54 @@ def check_connection(err_codes=True):
     # check if installed correctly
     print("Checking if installed correctly...")
     if (get_oms_version() == None):
-        print_errors(110, reinstall=False)
-        print("Running the installation part of the troubleshooter in order to find the issue...")
-        print("================================================================================")
-        return check_installation(err_codes=False)
+        if (print_errors(111) == 1):
+            return 1
+        else:
+            print("Running the installation part of the troubleshooter in order to find the issue...")
+            print("================================================================================")
+            return check_installation(err_codes=False, prev_success=101)
 
     # check omsadmin.conf
     print("Checking if omsadmin.conf created correctly...")
     checked_omsadmin = check_omsadmin()
     if (checked_omsadmin != 0):
-        print_errors(checked_omsadmin, reinstall=False)
-        print("Running the installation part of the troubleshooter in order to find the issue...")
-        print("================================================================================")
-        return check_installation(err_codes=False)
+        if (print_errors(checked_omsadmin) == 1):
+            return 1
+        else:
+            print("Running the installation part of the troubleshooter in order to find the issue...")
+            print("================================================================================")
+            return check_installation(err_codes=False, prev_success=101)
 
     # check general internet connectivity
     print("Checking if machine is connected to the internet...")
     checked_internet_connect = check_internet_connect()
     if (checked_internet_connect != 0):
-        return print_errors(checked_internet_connect, reinstall=False)
+        return print_errors(checked_internet_connect, continue_tsg=False)
 
     # check if agent service endpoint connected
     print("Checking if agent service endpoint is connected...")
     checked_as_endpt = check_agent_service_endpt()
     if (checked_as_endpt != 0):
-        return print_errors(checked_as_endpt, reinstall=False)
+        return print_errors(checked_as_endpt, continue_tsg=False)
 
     # check if log analytics endpoints connected
     print("Checking if log analytics endpoints are connected...")
     checked_la_endpts = check_log_analytics_endpts()
     if (checked_la_endpts != 0):
-        return print_errors(checked_la_endpts, reinstall=False)
+        return print_errors(checked_la_endpts, continue_tsg=False)
 
     # check if queries are successful
     print("Checking if queries are successful...")
     checked_e2e = check_e2e()
-    if (check_e2e == 1):
-        return 1
-    else:
-        success = checked_e2e
-
+    if (checked_e2e != 0):
+        if (check_e2e == 1):
+            return 1
+        else:
+            if (print_errors(checked_e2e) == 1):
+                return 1
+            else:
+                success = 101
+            
     return success
 
     

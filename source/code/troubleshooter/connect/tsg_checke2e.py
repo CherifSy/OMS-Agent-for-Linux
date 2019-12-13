@@ -5,8 +5,6 @@ import subprocess
 from tsg_errors import tsg_error_info, get_input
 
 def check_e2e():
-    success = 0
-
     # get machine's hostname
     hostname = subprocess.check_output(['hostname'], universal_newlines=True).rstrip('\n')
 
@@ -86,18 +84,9 @@ def check_e2e():
         
         if (len(failures) > 0):
             tsg_error_info.append((', '.join(failures),))
-            success = 128
-            # ask to quit troubleshooter completely
-            quit_tsg = get_input("Do you want to continue with the troubleshooter? (y/n)",\
-                                 (lambda x : x in ['y','yes','n','no']),\
-                                 "Please type either 'y'/'yes' or 'n'/'no' to proceed.")
-            # quit troubleshooter
-            if (quit_tsg.lower() in ['n','no']):
-                print("Exiting troubleshooter...")
-                print("================================================================================")
-                return 1
+            return 129
     
     print("Continuing on with troubleshooter...")
     print("--------------------------------------------------------------------------------")
-    return success
+    return 0
                     

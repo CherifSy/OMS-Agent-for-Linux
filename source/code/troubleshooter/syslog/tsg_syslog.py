@@ -6,16 +6,16 @@ from connect.tsg_connect     import check_connection
 from heartbeat.tsg_heartbeat import start_omsagent, check_omsagent_running, check_heartbeat
 from .tsg_checkconf          import check_conf_files
 
-def check_high_cpu_memory():
+def check_high_cpu_memory(prev_success=0):
     print("CHECKING FOR SYSLOG ISSUES...")
 
-    success = 0
+    success = prev_success
 
     # check if installed / connected / running correctly
     print("Checking if omsagent installed and running...")
     # check installation
     if (get_oms_version() == None):
-        print_errors(110, reinstall=False)
+        print_errors(111, reinstall=False)
         print("Running the installation part of the troubleshooter in order to find the issue...")
         print("================================================================================")
         return check_installation(err_codes=False)
@@ -30,7 +30,7 @@ def check_high_cpu_memory():
 
     # check running
     checked_omsagent_running = check_omsagent_running(workspace)
-    if (checked_omsagent_running == 121):
+    if (checked_omsagent_running == 122):
         # try starting omsagent
         print("Agent curently not running. Attempting to start omsagent...")
         checked_omsagent_running = start_omsagent(workspace)
@@ -44,7 +44,8 @@ def check_high_cpu_memory():
     checked_conf_files = check_conf_files()
     if (checked_conf_files != 0):
         print_errors(checked_conf_files, reinstall=False)
-        if (checked_conf_files in [110,113]):
+        if (checked_conf_files in [111,114]):
             print("Running the installation part of the troubleshooter in order to find the issue...")
             print("================================================================================")
             return check_installation(err_codes=False)
+        
