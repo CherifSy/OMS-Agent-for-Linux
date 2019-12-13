@@ -136,7 +136,6 @@ MAINTAINER:              'Microsoft Corporation'
 /opt/microsoft/omsagent/plugin/out_scom.rb;                             source/code/plugins/out_scom.rb;                       744; root; root
 
 /opt/microsoft/omsagent/bin/troubleshooter/omsagent_tsg;                        source/code/troubleshooter/dist/omsagent_tsg;   755; root; root
-/opt/microsoft/omsagent/bin/troubleshooter/files/README.md;                     README.md;                                      644; root; root
 /opt/microsoft/omsagent/bin/troubleshooter/files/Troubleshooting.md;            docs/Troubleshooting.md;                        644; root; root
 /opt/microsoft/omsagent/bin/troubleshooter/files/datafiles/base_omsagent.data;  installer/datafiles/base_omsagent.data;         644; root; root
 /opt/microsoft/omsagent/bin/troubleshooter/files/datafiles/linux.data;          installer/datafiles/linux.data;                 644; root; root
