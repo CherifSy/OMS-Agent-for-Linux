@@ -61,33 +61,36 @@ def start_omsagent(workspace):
 
 
 
-def check_heartbeat(prev_success = 0):
+def check_heartbeat(prev_success=0):
     print("CHECKING HEARTBEAT / HEALTH...")
 
     success = prev_success
 
+    # TODO: run `sh /opt/microsoft/omsagent/bin/omsadmin.sh -l` to check if onboarded and running
+
     # check if installed correctly
     print("Checking if installed correctly...")
     if (get_oms_version() == None):
-        if (print_errors(111) == 1):
-            return 1
-        else:
-            print("Running the installation part of the troubleshooter in order to find the issue...")
-            print("================================================================================")
-            return check_installation(err_codes=False)
+        print_errors(111)
+        print("Running the installation part of the troubleshooter in order to find the issue...")
+        print("================================================================================")
+        return check_installation(err_codes=False, prev_success=101)
 
     # get workspace ID
     workspace = tsginfo_lookup('WORKSPACE_ID')
     if (workspace == None):
         omsadmin_path = "/etc/opt/microsoft/omsagent/conf/omsadmin.conf"
         tsg_error_info.append(('Workspace ID', omsadmin_path))
-        return print_errors(119, continue_tsg=False)
+        print_errors(119)
+        print("Running the connection part of the troubleshooter in order to find the issue...")
+        print("================================================================================")
+        return check_connection(err_codes=False, prev_success=101)
     
     # check if running multi-homing
     print("Checking if omsagent is trying to run multihoming...")
     checked_multihoming = check_multihoming(workspace)
     if (checked_multihoming != 0):
-        return print_errors(checked_multihoming, continue_tsg=False)
+        return print_errors(checked_multihoming)
 
     # check if other agents are sending heartbeats
     # TODO
@@ -97,16 +100,12 @@ def check_heartbeat(prev_success = 0):
     checked_omsagent_running = check_omsagent_running(workspace)
     if (checked_omsagent_running == 122):
         # try starting omsagent
+        # TODO: find better way of doing this, check to see if agent is stopped / grab results
         print("Agent curently not running. Attempting to start omsagent...")
         checked_omsagent_running = start_omsagent(workspace)
     if (checked_omsagent_running != 0):
-        if (print_errors(checked_omsagent_running, restart_oms=True) == 1):
-            return 1
-        else:
-            checked_omsagent_running = check_omsagent_running(workspace)
-            if (checked_omsagent_running != 0):
-                return print_errors(checked_omsagent_running, continue_tsg=False)
-
+        print_errors(checked_omsagent_running)
+        return print_errors(checked_omsagent_running)
 
     # check if omsagent.log finds any heartbeat errors
     print("Checking for errors in omsagent.log...")
@@ -114,17 +113,13 @@ def check_heartbeat(prev_success = 0):
     if (checked_log_hb != 0):
         # connection issue
         if (checked_log_hb == 126):
-            if (print_errors(checked_log_hb) == 1):
-                return 1
-            else:
-                print("Running the connection part of the troubleshooter in order to find the issue...")
-                print("================================================================================")
-                return check_connection(err_codes=False)
+            print_errors(checked_log_hb)
+            print("Running the connection part of the troubleshooter in order to find the issue...")
+            print("================================================================================")
+            return check_connection(err_codes=False, prev_success=101)
         # other issue
-        if (print_errors(checked_log_hb, reinstall=True) == 1):
-            return 1
         else:
-            success = 101
+            return print_errors(checked_log_hb)
     
     return success
 

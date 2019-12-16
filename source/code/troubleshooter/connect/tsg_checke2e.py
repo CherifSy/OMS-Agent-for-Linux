@@ -29,6 +29,7 @@ def check_e2e():
 
     if (no_skip_all.lower() in ['y','yes']):
         for source in sources:
+            # TODO: fix query to what Henry suggested
             query = "{0} | where Computer == '{1}' | take 1".format(source, hostname)
             print("--------------------------------------------------------------------------------")
             print(" Please run this query:")
@@ -49,31 +50,13 @@ def check_e2e():
             elif (q_result.lower() in ['y','yes']):
                 successes.append(source)
                 print(" Continuing to next query...")
+                continue
 
             # query wasn't successful
             elif (q_result.lower() in ['n','no']):
                 failures.append(source)
-                # ask to quit troubleshooter completely
-                quit_tsg = get_input("Do you want to continue with the troubleshooter? (y/n)",\
-                                     (lambda x : x in ['y','yes','n','no']),\
-                                     "Please type either 'y'/'yes' or 'n'/'no' to proceed.")
-                # quit troubleshooter
-                if (quit_tsg.lower() in ['n','no']):
-                    print("Exiting troubleshooter...")
-                    print("================================================================================")
-                    return 1
-                # ask to quit this section
-                elif (quit_tsg.lower() in ['y','yes']):
-                    quit_section = get_input("Do you want to continue with this section? (y/n)",\
-                                             (lambda x : x in ['y','yes','n','no']),\
-                                             "Please type either 'y'/'yes' or 'n'/'no' to proceed.")
-                    # quit section
-                    if (quit_section.lower() in ['n','no']):
-                        break
-                    # continue queries
-                    elif (quit_section.lower() in ['y','yes']):
-                        print(" Continuing to next query...")
-                        continue
+                print(" Continuing to next query...")
+                continue
             
         # summarize query section
         success_qs = ', '.join(successes) if (len(successes) > 0) else 'none'

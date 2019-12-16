@@ -1,18 +1,16 @@
 # inspired by omsagent.py
 
-import platform
-
 from tsg_errors import tsg_error_info
 from tsg_info   import get_os_bits, get_os_version
 
- supported_dists = {'redhat' : ['6', '7'], # CentOS
-                    'centos' : ['6', '7'], # CentOS
-                    'red hat' : ['6', '7'], # Oracle, RHEL
-                    'oracle' : ['6', '7'], # Oracle
-                    'debian' : ['8', '9'], # Debian
-                    'ubuntu' : ['14.04', '16.04', '18.04'], # Ubuntu
-                    'suse' : ['12'], 'sles' : ['15'], # SLES
-                    'amzn' : ['2017.09']
+supported_dists = {'redhat' : ['6', '7'], # CentOS
+                   'centos' : ['6', '7'], # CentOS
+                   'red hat' : ['6', '7'], # Oracle, RHEL
+                   'oracle' : ['6', '7'], # Oracle
+                   'debian' : ['8', '9'], # Debian
+                   'ubuntu' : ['14.04', '16.04', '18.04'], # Ubuntu
+                   'suse' : ['12'], 'sles' : ['15'], # SLES
+                   'amzn' : ['2017.09']
 }
 
 

@@ -15,36 +15,30 @@ def check_high_cpu_memory(prev_success=0):
     print("Checking if omsagent installed and running...")
     # check installation
     if (get_oms_version() == None):
-        print_errors(111, reinstall=False)
+        print_errors(111)
         print("Running the installation part of the troubleshooter in order to find the issue...")
         print("================================================================================")
-        return check_installation(err_codes=False)
+        return check_installation(err_codes=False, prev_success=101)
 
     # check connection
     checked_la_endpts = check_log_analytics_endpts()
     if (checked_la_endpts != 0):
-        print_errors(checked_la_endpts, reinstall=False)
+        print_errors(checked_la_endpts)
         print("Running the connection part of the troubleshooter in order to find the issue...")
         print("================================================================================")
-        return check_connection(err_codes=False)
+        return check_connection(err_codes=False, prev_success=101)
 
     # check running
     checked_omsagent_running = check_omsagent_running(workspace)
-    if (checked_omsagent_running == 122):
-        # try starting omsagent
-        print("Agent curently not running. Attempting to start omsagent...")
-        checked_omsagent_running = start_omsagent(workspace)
     if (checked_omsagent_running != 0):
-        print_errors(checked_omsagent_running, reinstall=False)
+        print_errors(checked_omsagent_running)
         print("Running the general health part of the troubleshooter in order to find the issue...")
         print("================================================================================")
-        return check_heartbeat()
+        return check_heartbeat(prev_success=101)
 
     # check disk space
     checked_disk_space = check_disk_space()
     if (checked_disk_space != 0):
-        # TODO: decide if this should be a reinstall error
-        print_errors(checked_disk_space, reinstall=False)
-        return 101
+        return print_errors(checked_disk_space)
 
     # check CPU capacity

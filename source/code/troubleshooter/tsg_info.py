@@ -1,4 +1,5 @@
 import errno
+import platform
 import subprocess
 
 from tsg_errors import tsg_error_info, print_errors
@@ -50,33 +51,10 @@ def get_os_version():
         except:
             return None
 
-    # update tsg_info with 
+    # update tsg_info
     tsg_info['OS_ID'] = vm_dist
     tsg_info['OS_VERSION_ID'] = vm_ver
     return (vm_dist, vm_ver)
-
-
-
-
-
-
-    os_path = '/etc/os-release'
-    try:
-        with open(os_path, 'r') as os_file:
-            for line in os_file:
-                line = line.replace('"', '')
-                info = line.split('=')
-                tsg_info['OS_' + (info[0])] = (info[1]).rstrip('\n')
-        return 0
-    except IOError as e:
-        if (e.errno == errno.EACCES):
-            tsg_error_info.append((os_path,))
-            return 100
-        elif (e.errno == errno.ENOENT):
-            tsg_error_info.append(('file', os_path))
-            return 114
-        else:
-            raise
 
 # Package Manager
 def update_pkg_manager():
