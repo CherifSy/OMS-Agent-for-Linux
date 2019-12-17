@@ -50,7 +50,7 @@ def get_data(f, variables, files, links, dirs):
             # dependencies line
             elif (curr_section == "Dependencies"):
                 pass
-                # go through dependencies, make sure that currently running the version that works with it
+                # TODO: go through dependencies, make sure that currently running the version that works with it
 
             # file line
             elif (curr_section == "Files"):
@@ -265,7 +265,7 @@ def check_links(links, exist_err, perms_err):
 def check_filesystem():
     success = 0
 
-    dfs_path = "files/datafiles"  # path to datafiles from troubleshooter/
+    dfs_path = "files/datafiles"  # path to datafiles from troubleshooter
 
     # create lists to track errors
     exist_err = []
@@ -309,8 +309,8 @@ def check_filesystem():
 
     # update errors
     if (success == 114):
-        tsg_error_info += exist_err
+        tsg_error_info.extend(exist_err)
     elif (success == 115):
-        tsg_error_info += perms_err
+        tsg_error_info.extend(perms_err)
 
     return success

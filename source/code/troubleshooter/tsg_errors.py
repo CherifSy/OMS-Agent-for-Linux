@@ -10,6 +10,9 @@ except NameError:
 # error info edited when error occurs
 tsg_error_info = []
 
+# list of all errors called when script ran
+err_summary = []
+
 
 
 # dictionary correlating error codes to error messages
@@ -103,13 +106,13 @@ def ask_error_codes(err_type, find_err, err_types):
         # get dict of all error codes
         err_codes = get_error_codes(err_type)
         # ask user for error code
-        poss_ans = lambda x : x.is_digit() or (x in ['NOT_DEFINED', 'none'])
+        poss_ans = lambda x : x.isdigit() or (x in ['NOT_DEFINED', 'none'])
         err_code = get_input("Please input the error code", poss_ans,\
                              "Please enter an error code ({0})\nto get the error message, or "\
                                 "type 'none' to continue with the troubleshooter.".format(err_types))
         # did user give integer, but not valid error code
-        while (err_code.is_digit() and (not err_code in list(err_codes.keys()))):
-            print("{0} is not a valid {1} error code.")
+        while (err_code.isdigit() and (not err_code in list(err_codes.keys()))):
+            print("{0} is not a valid {1} error code.".format(err_code, err_type.lower()))
             err_code = get_input("Please input the error code", poss_ans,\
                                  "Please enter an error code ({0})\nto get the error message, or type "\
                                     "'none' to continue with the troubleshooter.".format(err_types))
@@ -132,12 +135,12 @@ def ask_install_error_codes():
     find_inst_err = "Installation error codes can be found by going through the command output in \n"\
                     "the terminal after running the `omsagent-*.universal.x64.sh` script to find \n"\
                     "a line that matches:\n"\
-                    "\n\n    Shell bundle exiting with code <err>\n"
+                    "\n    Shell bundle exiting with code <err>\n"
     return ask_error_codes('Installation', find_inst_err, "either an integer or 'NOT_DEFINED'")
 
 def ask_onboarding_error_codes():
     find_onbd_err = "Onboarding error codes can be found by running the command:\n"\
-                    "\n\n    echo $?\n\n"\
+                    "\n    echo $?\n\n"\
                     "directly after running the `/opt/microsoft/omsagent/bin/omsadmin.sh` tool."
     return ask_error_codes('Onboarding', find_onbd_err, "an integer")
 
@@ -171,8 +174,6 @@ def ask_reinstall():
         print("--------------------------------------------------------------------------------")
         return 101
 
-
-
 def ask_restart_oms():
     answer = get_input("Would you like to restart OMS Agent? (y/n)",\
                        (lambda x : x in ['y','yes','n','no']),\
@@ -193,8 +194,6 @@ def ask_restart_oms():
         print("Continuing on with troubleshooter...")
         print("--------------------------------------------------------------------------------")
         return 101
-
-
 
 def ask_continue():
     answer = get_input("Would you like to continue with the troubleshooter? (y/n)",\
@@ -221,16 +220,20 @@ def print_errors(err_code, reinstall=False, restart_oms=False, continue_tsg=Fals
     err_string = tsg_error_codes[err_code]
     # no formatting
     if (tsg_error_info == []):
-        print("ERROR: {0}".format(err_string))
+        err_string = "ERROR: {0}".format(err_string)
+        err_summary.append(err_string)
+        print(err_string)
     # needs input
     else:
         while (len(tsg_error_info) > 0):
             tup = tsg_error_info.pop(0)
             temp_err_string = err_string.format(*tup)
             if (warning):
-                print("WARNING: {0}".format(temp_err_string))
+                err_string = "WARNING: {0}".format(temp_err_string)
             else:
-                print("ERROR: {0}".format(temp_err_string))
+                err_string = "ERROR: {0}".format(temp_err_string)
+            err_summary.append(err_string)
+            print(err_string)
 
     if (warning):
         return 0

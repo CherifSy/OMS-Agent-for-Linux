@@ -9,9 +9,15 @@ from connect.tsg_connect  import check_connection
 from .tsg_multihoming     import check_multihoming
 from .tsg_log_hb          import check_log_heartbeat
 
+sc_path = '/opt/microsoft/omsagent/bin/service_control'
+
 
 
 def check_omsagent_running(workspace):
+    # check if OMS is running through service control
+    if (subprocess.call([sc_path, 'is-running']) == 1):
+        return 0
+
     # check if OMS is running through 'ps'
     processes = subprocess.check_output(['ps', '-ef'], universal_newlines=True).split('\n')
     for process in processes:
@@ -50,10 +56,9 @@ def check_omsagent_running(workspace):
     return 122
 
 def start_omsagent(workspace):
-    sc_path = '/opt/microsoft/omsagent/bin/service_control'
     try:
-        subprocess.check_output([sc_path, 'start'], universal_newlines=True,\
-                                stderr=subprocess.STDOUT)
+        subprocess.call([sc_path, 'enable'])
+        subprocess.call([sc_path, 'start'])
         return check_omsagent_running(workspace)
     except subprocess.CalledProcessError:
         tsg_error_info.append(('executable shell script', sc_path))

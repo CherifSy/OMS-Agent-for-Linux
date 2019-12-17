@@ -1,6 +1,6 @@
 import os
 
-from tsg_errors              import get_input, print_errors
+from tsg_errors              import get_input, print_errors, err_summary
 from install.tsg_install     import check_installation
 from connect.tsg_connect     import check_connection
 from heartbeat.tsg_heartbeat import check_heartbeat
@@ -91,12 +91,15 @@ def run_tsg():
     print("================================================================================")
     success = section()
 
+    print("================================================================================")
     if (success == 0):
         print("No errors were found.")
         # TODO: add smth about how couldn't find any errors, then collect the logs and give them to user and tell them to make ticket
         return
     else:
-        print_errors(success)
+        print("ERROR SUMMARY:")
+        for err in err_summary:
+            print("  {0}".format(err))
         return
     
 

@@ -38,8 +38,8 @@ def check_e2e():
             # ask if query was successful
             q_result = get_input("Was the query successful? (y/n/skip)",\
                                  (lambda x : x in ['y','yes','n','no','s','skip']),\
-                                 "Please type either 'y'/'yes' or 'n'/'no' to proceed,\n"\
-                                    "or 's'/'skip' to skip the {0} query.".format(source))
+                                 "Please type either 'y'/'yes' or 'n'/'no' to proceed, or\n"\
+                                    "'s'/'skip' to skip the {0} query.".format(source))
 
             # skip current query
             if (q_result.lower() in ['s','skip']):

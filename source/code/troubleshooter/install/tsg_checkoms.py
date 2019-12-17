@@ -84,6 +84,7 @@ def ask_update_old_version(oms_version, curr_oms_version):
                        "Please type either 'y'/'yes' or 'n'/'no' to proceed.")
     # user does want to update
     if (answer.lower() in ['y', 'yes']):
+        print("--------------------------------------------------------------------------------")
         print("Please head to the Github link below and click on 'Download Latest OMS Agent\n"\
               "for Linux ({0})' in order to update to the newest version:".format(tsg_info['CPU_BITS']))
         print("\n    https://github.com/microsoft/OMS-Agent-for-Linux\n")
