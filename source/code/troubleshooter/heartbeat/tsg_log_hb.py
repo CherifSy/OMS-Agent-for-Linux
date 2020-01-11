@@ -44,18 +44,18 @@ def check_log_heartbeat(workspace):
         if (len(parsed_log_errs) > 0):
             for log_err in parsed_log_errs:
                 tsg_error_info.append((log_path, log_err[0], log_err[1], log_err[4]))
-            return 124
+            return 126
 
         # filter warnings
         parsed_log_warns = list(filter(lambda x : (x[3]) == '[warn]', parsed_log_lines))
         if (len(parsed_log_warns) > 0):
             hb_fail_logs = list(filter(lambda x : 'failed to flush the buffer' in x[4], parsed_log_warns))
             if (len(hb_fail_logs) > 0):
-                return 126
+                return 128
             else:
                 for log_warn in parsed_log_warns:
                     tsg_error_info.append((log_path, log_warn[0], log_warn[1], log_warn[4]))
-                return 125
+                return 127
 
         # logs show no errors or warnings
         return 0
@@ -79,8 +79,8 @@ def check_log_heartbeat(workspace):
             # tail some other error
             else:
                 tsg_error_info.append((log_path, err))
-                return 123
+                return 125
         # catch-all in case of fluke error
         else:
             tsg_error_info.append((log_path, e.output))
-            return 123
+            return 125

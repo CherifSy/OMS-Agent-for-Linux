@@ -9,15 +9,68 @@ from connect.tsg_connect  import check_connection
 from .tsg_multihoming     import check_multihoming
 from .tsg_log_hb          import check_log_heartbeat
 
-sc_path = '/opt/microsoft/omsagent/bin/service_control'
+omsadmin_conf_path = "/etc/opt/microsoft/omsagent/conf/omsadmin.conf"
+omsadmin_sh_path = "/opt/microsoft/omsagent/bin/omsadmin.sh"
+sc_path = "/opt/microsoft/omsagent/bin/service_control"
 
 
 
-def check_omsagent_running(workspace):
+def check_omsagent_running_sc():
     # check if OMS is running through service control
-    if (subprocess.call([sc_path, 'is-running']) == 1):
+    is_running = subprocess.call([sc_path, 'is-running'])
+    if (is_running == 1):
         return 0
+    elif (is_running == 0):
+        # don't have any extra info
+        return 122
+    else:
+        return 200  # TODO: fix error code
 
+def check_omsagent_running_omsadmin(workspace):
+    output = subprocess.check_output(['sh', omsadmin_sh_path, '-l'], universal_newlines=True)
+    output_regx = "Primary Workspace: (\S+)    Status: (\w+)\((\b+)\)\n"
+    output_matches = re.match(output_regx, output)
+
+    if (output_matches == None):
+        err_regx = "-e error	(\b+)\n"
+        err_matches = re.match(err_regx, output)
+        if (err_matches == None):
+            return 200  # TODO: fix err code here
+        # matched to error
+        err_info = err_matches.groups()[0]
+        # check if permission error
+        if (err_info == "This script must be run as root or as the omsagent user."):
+            tsg_error_info.append((omsadmin_sh_path,))
+            return 100
+        # some other error
+        tsg_error_info.append((omsadmin_sh_path, err_info))
+        return 125
+
+    # matched to output
+    (output_wkspc, status, details) = output_matches.groups()
+
+    # check correct workspace
+    if (output_wkspc != workspace):
+        tsg_error_info.append(output_wkspc, workspace)
+        return 121
+
+    # check status
+    if (status=="Onboarded" and details=="OMS Agent Running"):
+        # enabled, running
+        return 0
+    elif (status=="Warning" and details=="OMSAgent Registered, Not Running"):
+        # enabled, stopped
+        return 123
+    elif (status=="Saved" and details=="OMSAgent Not Registered, Workspace Configuration Saved"):
+        # disabled
+        return 124
+    else:
+        # unknown status
+        info_text = "OMS Agent has status {0} ({1})".format(status, details)
+        tsg_error_info.append((info_text,))
+        return 122
+
+def check_omsagent_running_ps(workspace):
     # check if OMS is running through 'ps'
     processes = subprocess.check_output(['ps', '-ef'], universal_newlines=True).split('\n')
     for process in processes:
@@ -55,12 +108,37 @@ def check_omsagent_running(workspace):
     # none of the processes running are OMS
     return 122
 
-def start_omsagent(workspace):
-    try:
-        subprocess.call([sc_path, 'enable'])
-        subprocess.call([sc_path, 'start'])
+def check_omsagent_running(workspace):
+    # check through is-running
+    checked_sc = check_omsagent_running_sc()
+    if (checked_sc != 122):
+        return checked_sc
+
+    # check if is a process
+    checked_ps = check_omsagent_running_ps(workspace)
+    if (checked_ps != 122):
+        return checked_ps
+    
+    # get more info
+    return check_omsagent_running_omsadmin(workspace)
+        
+
+
+
+def start_omsagent(workspace, enabled=False):
+    print("Agent curently not running. Attempting to start omsagent...")
+    result = 0
+    # enable the agent if necessary
+    if (not enabled):
+        result = subprocess.call([sc_path, 'enable'])
+    # start the agent if enable was successful
+    result = (subprocess.call([sc_path, 'start'])) if (result == 0) else (result)
+
+    # check if successful
+    if (result == 0):
         return check_omsagent_running(workspace)
-    except subprocess.CalledProcessError:
+    elif (result == 127):
+        # script doesn't exist
         tsg_error_info.append(('executable shell script', sc_path))
         return 114
 
@@ -84,8 +162,7 @@ def check_heartbeat(prev_success=0):
     # get workspace ID
     workspace = tsginfo_lookup('WORKSPACE_ID')
     if (workspace == None):
-        omsadmin_path = "/etc/opt/microsoft/omsagent/conf/omsadmin.conf"
-        tsg_error_info.append(('Workspace ID', omsadmin_path))
+        tsg_error_info.append(('Workspace ID', omsadmin_conf_path))
         print_errors(119)
         print("Running the connection part of the troubleshooter in order to find the issue...")
         print("================================================================================")
@@ -106,7 +183,6 @@ def check_heartbeat(prev_success=0):
     if (checked_omsagent_running == 122):
         # try starting omsagent
         # TODO: find better way of doing this, check to see if agent is stopped / grab results
-        print("Agent curently not running. Attempting to start omsagent...")
         checked_omsagent_running = start_omsagent(workspace)
     if (checked_omsagent_running != 0):
         print_errors(checked_omsagent_running)
@@ -117,7 +193,7 @@ def check_heartbeat(prev_success=0):
     checked_log_hb = check_log_heartbeat(workspace)
     if (checked_log_hb != 0):
         # connection issue
-        if (checked_log_hb == 126):
+        if (checked_log_hb == 128):
             print_errors(checked_log_hb)
             print("Running the connection part of the troubleshooter in order to find the issue...")
             print("================================================================================")

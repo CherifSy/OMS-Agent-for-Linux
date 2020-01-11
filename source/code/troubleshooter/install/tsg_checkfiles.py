@@ -153,7 +153,7 @@ def check_permissions(f, perm_info, corr_info, typ, perms_err):
         success = 115
     
     # check permissions
-    perms = (perm_info[0])[1:]
+    perms = (perm_info[0])[1:].rstrip('.')
     corr_perms = perm_oct_to_symb(corr_info[0])
     if (perms != corr_perms):
         perms_err.append((typ, f, 'permissions', perms, corr_perms))
@@ -273,6 +273,14 @@ def check_filesystem():
 
     datafiles = os.listdir(dfs_path)
     for df in datafiles:
+        # skip if wrong distro
+        if (tsginfo_lookup('OS_READABLE_ID') == 'rhel' and df == 'wid_files_ubuntu.data'):
+            print("TEST REMOVE WHEN DONE: skipping wrong distro")
+            continue
+        if (tsginfo_lookup('OS_READABLE_ID') == 'ubuntu' and df == 'wid_files_redhat.data'):
+            print("TEST REMOVE WHEN DONE: skipping wrong distro")
+            continue
+        
         variables = dict()  # {var name : content}
         files = dict()      # {path : [perms, user, group]}
         links = dict()      # {path : [perms, user, group, linked path]}
@@ -288,7 +296,7 @@ def check_filesystem():
             continue
 
         # getting workspace id for protected files
-        if (df == "wid_files.data"):
+        if (df.startswith("wid_files_")):
             variables['WORKSPACE_ID'] = tsginfo_lookup('WORKSPACE_ID')
 
         # populate dictionaries with info from data files

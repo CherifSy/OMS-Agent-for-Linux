@@ -8,11 +8,12 @@ from .tsg_checkendpts     import check_internet_connect, check_agent_service_end
                                  check_log_analytics_endpts
 from .tsg_checke2e        import check_e2e
 
+omsadmin_path = "/opt/microsoft/omsagent/bin/omsadmin.sh"
+
 
 
 # Verify omsadmin.conf exists / not empty
-def check_omsadmin():
-    omsadmin_path = "/opt/microsoft/omsagent/bin/omsadmin.sh"
+def check_omsadmin(): 
     # check if exists
     if (not os.path.isfile(omsadmin_path)):
         tsg_error_info.append(('file', omsadmin_path))

@@ -23,7 +23,7 @@ def check_internet_connect():
     if (check_endpt("bing.com") and check_endpt("google.com")):
         return 0
     else:
-        return 128
+        return 130
 
 
 

@@ -20,7 +20,7 @@ def check_multihoming(workspace):
     # 2+ potential workspaces
     if len(potential_workspaces) > 1:
         tsg_error_info.append((workspace_id_list))
-        return 127
+        return 129
 
     # 0 potential workspaces
     if (len(potential_workspaces) == 0):

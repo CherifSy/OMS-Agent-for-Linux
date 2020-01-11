@@ -51,11 +51,11 @@ def check_cert():
                 # openssl some other error
                 else:
                     tsg_error_info.append((crt_path, err))
-                    return 123
+                    return 125
             # catch-all in case of fluke error
             else:
                 tsg_error_info.append((crt_path, e.output))
-                return 123
+                return 125
         else:
             tsg_error_info.append((crt_path,))
             return 116
@@ -86,7 +86,7 @@ def check_key():
         # openssl some other error
         else:
             tsg_error_info.append((key_path, err))
-            return 123
+            return 125
     # key error
     tsg_error_info.append((key_path,))
     return 117

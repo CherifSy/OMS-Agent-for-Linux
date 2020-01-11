@@ -48,24 +48,30 @@ tsg_error_codes = {
     120 : "Machine couldn't connect to {0}",
     121 : "The agent is configured to report to a different workspace - the GUID "\
           "given is {0}, while the workspace is {1}.",
-    122 : "The agent isn't running / will not start.",
-    123 : "Couldn't access file {0} due to the following reason: {1}.",
-    124 : "At {0} {1} the agent logged this error: {2}. Please check out {3} for "\
+    122 : "The agent isn't running / will not start. {0}",
+    123 : "The agent is currently stopped. Run the command below to start it:\n"\
+          "\n  $ /opt/microsoft/omsagent/bin/service_control start\n",
+    124 : "The agent is currently disabled. Run the command below to enable it:\n"\
+          "\n  $ /opt/microsoft/bin/service_control enable\n\n"\
+          "And run the command below to start it:\n"\
+          "\n  $ /opt/microsoft/omsagent/bin/service_control start\n",
+    125 : "Couldn't access / run {0} due to the following reason: {1}.",
+    126 : "At {0} {1} the agent logged this error: {2}. Please check out {3} for "\
           "more information.",
-    125 : "At {0} {1} the agent logged this warning: {2}. Please check out {3} for "\
+    127 : "At {0} {1} the agent logged this warning: {2}. Please check out {3} for "\
           "more information.",
-    126 : "Heartbeats are failing to send data to the workspace.",
-    127 : "Machine registered with more than one log analytics workspace. List of "\
+    128 : "Heartbeats are failing to send data to the workspace.",
+    129 : "Machine registered with more than one log analytics workspace. List of "\
           "workspaces: {0}",
-    128 : "Machine is not connected to the internet.",
-    129 : "The following queries failed: {0}.",
-    130 : "Syslog collection is set up for workspace {0}, but OMS is set up with "\
-          "workspace {1}.",
-    131 : "With protocol type {0}, ports need to be preceded by '{1}', but currently "\
+    130 : "Machine is not connected to the internet.",
+    131 : "The following queries failed: {0}.",
+    132 : "Syslog collection is set up for workspace {0}, but OMS is set up with "\
+          "workspace {1}. Please see {2} for the issue.",
+    133 : "With protocol type {0}, ports need to be preceded by '{1}', but currently "\
           "are preceded by '{2}'. Please see {3} for the issue.",
-    131 : "Syslog is set up to bind to port {0}, but is currently sending to port {1}. "\
+    134 : "Syslog is set up to bind to port {0}, but is currently sending to port {1}. "\
           "Please see {2} for the issue.",
-    132 : "Issue with setting up ports for syslog. Please see {0} and {1} for the issue."
+    135 : "Issue with setting up ports for syslog. Please see {0} and {1} for the issue."
 
 }  # TODO: keep up to date with error codes onenote
 
@@ -214,10 +220,11 @@ def print_errors(err_code, reinstall=False, restart_oms=False, continue_tsg=Fals
     warning = False
     if (err_code == 1):
         return 1
-    if (err_code == 125):
+    if (err_code == 127):
         warning = True
 
     err_string = tsg_error_codes[err_code]
+
     # no formatting
     if (tsg_error_info == []):
         err_string = "ERROR: {0}".format(err_string)
@@ -229,11 +236,11 @@ def print_errors(err_code, reinstall=False, restart_oms=False, continue_tsg=Fals
             tup = tsg_error_info.pop(0)
             temp_err_string = err_string.format(*tup)
             if (warning):
-                err_string = "WARNING: {0}".format(temp_err_string)
+                final_err_string = "WARNING: {0}".format(temp_err_string)
             else:
-                err_string = "ERROR: {0}".format(temp_err_string)
-            err_summary.append(err_string)
-            print(err_string)
+                final_err_string = "ERROR: {0}".format(temp_err_string)
+            err_summary.append(final_err_string)
+            print(final_err_string)
 
     if (warning):
         return 0

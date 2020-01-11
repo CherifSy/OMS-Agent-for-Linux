@@ -62,15 +62,15 @@ def check_port(port, sys_bind, sys_pt):
     if (pt_count != corr_pt_count):
         pt = port[:pt_count]
         tsg_error_info.append((sys_pt, corr_pt, pt, omsagent95_path))
-        return 131
+        return 133
     # wrong port
     curr_bind = (port[pt_count+1:]).split(':')[0]
     if (curr_bind != sys_bind):
         tsg_error_info.append((sys_bind, curr_bind, omsagent95_path))
-        return 131
+        return 134
     # some other error?
     tsg_error_info.append((syslogconf_path, omsagent95_path))
-    return 132
+    return 135
 
         
     
@@ -102,7 +102,7 @@ def check_omsagent95(sys_bind, sys_pt):
             syslog_wkspc = (match_comment.groups())[0]
             if (workspace != syslog_wkspc):
                 tsg_error_info.append((syslog_wkspc,workspace,syslogconf_path))
-                return 130
+                return 132
             else:
                 continue
 

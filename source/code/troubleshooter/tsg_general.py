@@ -96,6 +96,8 @@ def run_tsg():
         print("No errors were found.")
         # TODO: add smth about how couldn't find any errors, then collect the logs and give them to user and tell them to make ticket
         return
+    elif (success == 1):
+        return
     else:
         print("ERROR SUMMARY:")
         for err in err_summary:

@@ -1,8 +1,11 @@
 import errno
+import os
 import platform
 import subprocess
 
 from tsg_errors import tsg_error_info, print_errors
+
+conf_path = "/etc/opt/microsoft/omsagent/conf/omsadmin.conf"
 
 tsg_info = dict()
 
@@ -29,6 +32,15 @@ def get_os_bits():
     tsg_info['CPU_BITS'] = cpu_bits
     return cpu_bits
 
+dist_to_id = {'redhat' : 'rhel',
+              'centos' : 'centos',
+              'red hat' : 'rhel',
+              'oracle' : 'oracle',
+              'debian' : 'debian',
+              'ubuntu' : 'ubuntu',
+              'suse' : 'sles',
+              'amzn' : 'amzn'}
+
 # OS Info
 def get_os_version():
     # get vm info
@@ -54,18 +66,32 @@ def get_os_version():
     # update tsg_info
     tsg_info['OS_ID'] = vm_dist
     tsg_info['OS_VERSION_ID'] = vm_ver
+    for dist in dist_to_id.keys():
+        if (vm_dist.lower().startswith(dist)):
+            tsg_info['OS_READABLE_ID'] = dist_to_id[dist]
     return (vm_dist, vm_ver)
 
 # Package Manager
 def update_pkg_manager():
-    is_dpkg = subprocess.check_output(['which', 'dpkg'], universal_newlines=True)
-    if (is_dpkg != ''):
-        tsg_info['PKG_MANAGER'] = 'dpkg'
-        return 0
-    is_rpm = subprocess.check_output(['which', 'rpm'], universal_newlines=True)
-    if (is_rpm != ''):
-        tsg_info['PKG_MANAGER'] = 'rpm'
-        return 0
+    with open(os.devnull, 'w') as devnull:
+        # try dpkg
+        try:
+            is_dpkg = subprocess.check_output(['which', 'dpkg'], \
+                        universal_newlines=True, stderr=devnull)
+            if (is_dpkg != ''):
+                tsg_info['PKG_MANAGER'] = 'dpkg'
+                return 0
+        except subprocess.CalledProcessError:
+            pass
+        # try rpm
+        try:
+            is_rpm = subprocess.check_output(['which', 'rpm'], \
+                        universal_newlines=True, stderr=devnull)
+            if (is_rpm != ''):
+                tsg_info['PKG_MANAGER'] = 'rpm'
+                return 0
+        except subprocess.CalledProcessError:
+            pass
     # neither
     return 107
 
@@ -113,7 +139,6 @@ def get_rpm_pkg_version(pkg):
 
 # omsadmin.conf
 def update_omsadmin():
-    conf_path = "/etc/opt/microsoft/omsagent/conf/omsadmin.conf"
     try:
         with open(conf_path, 'r') as conf_file:
             for line in conf_file:
@@ -125,7 +150,7 @@ def update_omsadmin():
             tsg_error_info.append((conf_path,))
             return 100
         elif (e.errno == errno.ENOENT):
-            tsg_error_info.append(('file', os_path))
+            tsg_error_info.append(('file', conf_path))
             return 114
         else:
             raise

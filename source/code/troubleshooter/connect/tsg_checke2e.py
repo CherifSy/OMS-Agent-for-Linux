@@ -67,7 +67,7 @@ def check_e2e():
         
         if (len(failures) > 0):
             tsg_error_info.append((', '.join(failures),))
-            return 129
+            return 131
     
     print("Continuing on with troubleshooter...")
     print("--------------------------------------------------------------------------------")
