@@ -1,5 +1,4 @@
 import errno
-import os
 import platform
 import subprocess
 
@@ -73,25 +72,24 @@ def get_os_version():
 
 # Package Manager
 def update_pkg_manager():
-    with open(os.devnull, 'w') as devnull:
-        # try dpkg
-        try:
-            is_dpkg = subprocess.check_output(['which', 'dpkg'], \
-                        universal_newlines=True, stderr=devnull)
-            if (is_dpkg != ''):
-                tsg_info['PKG_MANAGER'] = 'dpkg'
-                return 0
-        except subprocess.CalledProcessError:
-            pass
-        # try rpm
-        try:
-            is_rpm = subprocess.check_output(['which', 'rpm'], \
-                        universal_newlines=True, stderr=devnull)
-            if (is_rpm != ''):
-                tsg_info['PKG_MANAGER'] = 'rpm'
-                return 0
-        except subprocess.CalledProcessError:
-            pass
+    # try dpkg
+    try:
+        is_dpkg = subprocess.check_output(['which', 'dpkg'], \
+                    universal_newlines=True, stderr=subprocess.STDOUT)
+        if (is_dpkg != ''):
+            tsg_info['PKG_MANAGER'] = 'dpkg'
+            return 0
+    except subprocess.CalledProcessError:
+        pass
+    # try rpm
+    try:
+        is_rpm = subprocess.check_output(['which', 'rpm'], \
+                    universal_newlines=True, stderr=subprocess.STDOUT)
+        if (is_rpm != ''):
+            tsg_info['PKG_MANAGER'] = 'rpm'
+            return 0
+    except subprocess.CalledProcessError:
+        pass
     # neither
     return 107
 

@@ -66,7 +66,7 @@ def check_log_heartbeat(workspace):
         err_msg = "tail: cannot open '{0}' for reading: (\b+)\n".format(log_path)
         match_err = re.match(err_msg, e.output)
 
-        if (match_err != None):
+        if (e.returncode == 1 and match_err != None):
             err = (match_err.groups())[0]
             # tail permissions error
             if (err == "Permission denied"):

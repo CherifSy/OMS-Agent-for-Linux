@@ -71,7 +71,12 @@ tsg_error_codes = {
           "are preceded by '{2}'. Please see {3} for the issue.",
     134 : "Syslog is set up to bind to port {0}, but is currently sending to port {1}. "\
           "Please see {2} for the issue.",
-    135 : "Issue with setting up ports for syslog. Please see {0} and {1} for the issue."
+    135 : "Issue with setting up ports for syslog. Please see {0} and {1} for the issue.",
+    136 : "Couldn't find 'systemctl' on machine. Please download 'systemctl' and try again.",
+    137 : "Couldn't find either 'rsyslog' or 'syslogng' on machine. Please download "\
+          "one of the two services and try again.",
+    138 : "{0} current status is the following: '{1}'. Please run the command 'systemctl "\
+          "status {0}' for more information."
 
 }  # TODO: keep up to date with error codes onenote
 
@@ -180,7 +185,8 @@ def ask_reinstall():
         print("--------------------------------------------------------------------------------")
         return 101
 
-def ask_restart_oms():
+def ask_restart_oms():['systemctl','status',service], \
+                            universal_newlines=True
     answer = get_input("Would you like to restart OMS Agent? (y/n)",\
                        (lambda x : x in ['y','yes','n','no']),\
                        "Please type either 'y'/'yes' or 'n'/'no' to proceed.")

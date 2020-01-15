@@ -34,31 +34,30 @@ def check_cert():
             return 0
         tsg_error_info.append((crt_path,))
         return 116
-    except e:
-        if (e == subprocess.CalledProcessError):
-            err_msg = "Can't open {0} for reading, (\b+)".format(crt_path)
-            match_err = re.match(err_msg, (e.split('\n'))[0])
-            if (match_err != None):
-                err = (match_err.groups())[0]
-                # openssl permissions error
-                if (err == "Permission denied"):
-                    tsg_error_info.append((crt_path,))
-                    return 100
-                # openssl file existence error
-                elif (err == "No such file or directory"):
-                    tsg_error_info.append(("file", crt_path))
-                    return 114
-                # openssl some other error
-                else:
-                    tsg_error_info.append((crt_path, err))
-                    return 125
-            # catch-all in case of fluke error
+    # error with openssl
+    except subprocess.CalledProcessError as e:
+        try:
+            err = e.output.split('\n')[1].split(':')[5]
+            # openssl permissions error
+            if (err == "Permission denied"):
+                tsg_error_info.append((crt_path,))
+                return 100
+            # openssl file existence error
+            elif (err == "No such file or directory"):
+                tsg_error_info.append(("file", crt_path))
+                return 114
+            # openssl some other error
             else:
-                tsg_error_info.append((crt_path, e.output))
+                tsg_error_info.append((crt_path, err))
                 return 125
-        else:
-            tsg_error_info.append((crt_path,))
-            return 116
+        # catch-all in case of fluke error
+        except:
+            tsg_error_info.append((crt_path, e.output))
+            return 125
+    # general error
+    except:
+        tsg_error_info.append((crt_path,))
+        return 116
 
 
 
@@ -70,11 +69,9 @@ def check_key():
     # check if successful
     if ("RSA key ok\n" in key_info):
         return 0
-    # check if file access error
-    err_msg = "Can't open {0} for reading, (\b+)".format(key_path)
-    match_err = re.match(err_msg, (key_info.split('\n'))[0])
-    if (match_err != None):
-        err = (match_err.groups())[0]
+
+    try:
+        err = e.output.split('\n')[1].split(':')[5]
         # openssl permissions error
         if (err == "Permission denied"):
             tsg_error_info.append((key_path,))
@@ -87,9 +84,10 @@ def check_key():
         else:
             tsg_error_info.append((key_path, err))
             return 125
-    # key error
-    tsg_error_info.append((key_path,))
-    return 117
+    # cert error
+    except:
+        tsg_error_info.append((key_path,))
+        return 117
 
 
 

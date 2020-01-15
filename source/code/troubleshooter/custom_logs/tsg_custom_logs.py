@@ -1,14 +1,31 @@
-from tsg_errors              import print_errors
+from tsg_errors              import get_input, print_errors
 from install.tsg_checkoms    import get_oms_version
 from install.tsg_install     import check_installation
 from connect.tsg_checkendpts import check_log_analytics_endpts
 from connect.tsg_connect     import check_connection
 from heartbeat.tsg_heartbeat import start_omsagent, check_omsagent_running, check_heartbeat
 from .tsg_checkconf          import check_conf_files
-from .tsg_checkrsysng        import check_services
 
-def check_syslog(prev_success=0):
-    print("CHECKING FOR SYSLOG ISSUES...")
+def check_custom_logs(prev_success=0, requested=False):
+    if (not requested):
+        print(" To check if you are using custom logs, please go to https://ms.portal.azure.com\n"\
+              " and navigate to your workspace. Once there, please navigate to the 'Advanced\n"\
+              " settings' blade, and then go to 'Data' > 'Custom Logs'. There you should be\n"\
+              " to see any custom logs you may have.\n")
+        using_cl = get_input("Are you currently using custom logs? (y/n)",\
+                            (lambda x : x in ['y','yes','n','no']),\
+                            "Please type either 'y'/'yes' or 'n'/'no' to proceed.")
+        # not using custom logs
+        if (using_cl in ['n','no']):
+            print("Continuing on with the rest of the troubleshooter...")
+            print("================================================================================")
+            return prev_success
+        # using custom logs
+        else:
+            print("Continuing on with troubleshooter...")
+            print("--------------------------------------------------------------------------------")
+
+    print("CHECKING FOR CUSTOM LOG ISSUES...")
 
     success = prev_success
 
@@ -37,16 +54,5 @@ def check_syslog(prev_success=0):
         print("================================================================================")
         return check_heartbeat(prev_success=101)
 
-    # check for syslog.conf and 95-omsagent.conf
-    checked_conf_files = check_conf_files()
-    if (checked_conf_files != 0):
-        print_errors(checked_conf_files)
-        if (checked_conf_files in [111,114]):
-            print("Running the installation part of the troubleshooter in order to find the issue...")
-            print("================================================================================")
-            return check_installation(err_codes=False, prev_success=101)
-
-    checked_services = check_services()
-    if (checked_services != 0):
-        return print_errors(checked_services)
+    
         

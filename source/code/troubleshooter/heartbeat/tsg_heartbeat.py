@@ -185,7 +185,6 @@ def check_heartbeat(prev_success=0):
         # TODO: find better way of doing this, check to see if agent is stopped / grab results
         checked_omsagent_running = start_omsagent(workspace)
     if (checked_omsagent_running != 0):
-        print_errors(checked_omsagent_running)
         return print_errors(checked_omsagent_running)
 
     # check if omsagent.log finds any heartbeat errors
