@@ -6,7 +6,7 @@ from connect.tsg_connect     import check_connection
 from heartbeat.tsg_heartbeat import start_omsagent, check_omsagent_running, check_heartbeat
 from .tsg_checkconf          import check_conf_files
 
-def check_custom_logs(prev_success=0, requested=False):
+def check_custom_logs(prev_success=0, requested=True):
     if (not requested):
         print(" To check if you are using custom logs, please go to https://ms.portal.azure.com\n"\
               " and navigate to your workspace. Once there, please navigate to the 'Advanced\n"\

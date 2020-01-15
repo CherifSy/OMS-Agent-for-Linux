@@ -1,9 +1,12 @@
 import os
 
-from tsg_errors              import get_input, print_errors, err_summary
-from install.tsg_install     import check_installation
-from connect.tsg_connect     import check_connection
-from heartbeat.tsg_heartbeat import check_heartbeat
+from tsg_errors                    import get_input, print_errors, err_summary
+from install.tsg_install           import check_installation
+from connect.tsg_connect           import check_connection
+from heartbeat.tsg_heartbeat       import check_heartbeat
+from high_cpu_mem.tsg_high_cpu_mem import check_high_cpu_memory
+from syslog.tsg_syslog             import check_syslog
+from custom_logs.tsg_custom_logs   import check_custom_logs
 
 # check to make sure the user is running as root
 def check_sudo():
@@ -47,7 +50,17 @@ def check_all():
     if (checked_hb != 0):
         return checked_hb
 
-    # TODO: fill in 4, 5, and 6 when implemented
+    # TODO: fill in 4 when implemented
+
+    print("================================================================================")
+    checked_syslog = check_syslog()
+    if (checked_syslog != 0):
+        return checked_syslog
+
+    print("================================================================================")
+    checked_cl = check_custom_logs(requested=False)
+    if (checked_cl != 0):
+        return checked_cl
 
     return 0
 
