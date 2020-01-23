@@ -185,8 +185,7 @@ def ask_reinstall():
         print("--------------------------------------------------------------------------------")
         return 101
 
-def ask_restart_oms():['systemctl','status',service], \
-                            universal_newlines=True
+def ask_restart_oms():
     answer = get_input("Would you like to restart OMS Agent? (y/n)",\
                        (lambda x : x in ['y','yes','n','no']),\
                        "Please type either 'y'/'yes' or 'n'/'no' to proceed.")
