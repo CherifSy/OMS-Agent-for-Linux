@@ -1,5 +1,6 @@
 import os
 import subprocess
+import time
 
 from tsg_errors import get_input
 
@@ -28,6 +29,7 @@ def scan_top_files(num_files, tto):
     # check every second
     for sec in range(tto):
         check_top_files(top_files)
+        time.sleep(1)
 
         
 

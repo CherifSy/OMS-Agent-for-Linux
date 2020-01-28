@@ -13,21 +13,29 @@ def check_log_heartbeat(workspace):
 
     # get tail of logs
     log_path = "/var/opt/microsoft/omsagent/{0}/log/omsagent.log".format(workspace)
+    log_tail_size = 50
+    lts_mult = 1
+    parsed_log_lines = []
+    log_template = r"^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2} (\+|-)\d{4} \[\w+\]: .*$"
     try:
-        logs = subprocess.check_output(['tail', log_path], universal_newlines=True,\
-                                        stderr=subprocess.STDOUT)
+        while (parsed_log_lines == []):  # in case last 50 is all a conf file
+            logs = subprocess.check_output(['tail','-n',str(log_tail_size*lts_mult),log_path],\
+                    universal_newlines=True, stderr=subprocess.STDOUT)
 
-        # parse logs
-        log_lines = logs.split('\n')
-        parsed_log_lines = []
-        for line in log_lines:
-            if (line == ''):
-                continue
-            split_half = line.split(': ')
-            parsed_log = split_half[0].split(' ')
-            parsed_log.append(': '.join(split_half[1:]))
-            # [ date, time, zone, [logtype], log ]
-            parsed_log_lines.append(parsed_log)
+            # parse logs
+            log_lines = logs.split('\n')[:log_tail_size]
+            for line in log_lines:
+                # empty line
+                if (line == ''):
+                    continue
+                # conf file text
+                if (re.match(log_template, line) == None):
+                    continue
+                parsed_log = line.split(' ', 4)
+                parsed_log[3] = parsed_log[3].rstrip(':')
+                parsed_log.append(line)
+                # [ date, time, zone, [logtype], log, unparsed log ]
+                parsed_log_lines.append(parsed_log)
 
         # # filter logs to last 3 minutes
         # endtime_str = ' '.join(parsed_log_lines[-1][0:2])
@@ -42,8 +50,8 @@ def check_log_heartbeat(workspace):
         # filter out errors
         parsed_log_errs = list(filter(lambda x : (x[3]) == '[error]', parsed_log_lines))
         if (len(parsed_log_errs) > 0):
-            for log_err in parsed_log_errs:
-                tsg_error_info.append((log_path, log_err[0], log_err[1], log_err[4]))
+            log_errs = '\n  ' + parsed_log_errs.join('\n  ')
+            tsg_error_info.append((log_errs,))
             return 126
 
         # filter warnings
@@ -53,8 +61,8 @@ def check_log_heartbeat(workspace):
             if (len(hb_fail_logs) > 0):
                 return 128
             else:
-                for log_warn in parsed_log_warns:
-                    tsg_error_info.append((log_path, log_warn[0], log_warn[1], log_warn[4]))
+                log_warns = '\n  ' + parsed_log_warns.join('\n  ')
+                tsg_error_info.append((log_warns,))
                 return 127
 
         # logs show no errors or warnings
