@@ -56,10 +56,8 @@ tsg_error_codes = {
           "And run the command below to start it:\n"\
           "\n  $ /opt/microsoft/omsagent/bin/service_control start\n",
     125 : "Couldn't access / run {0} due to the following reason: {1}.",
-    126 : "At {0} {1} the agent logged this error: {2}. Please check out {3} for "\
-          "more information.",
-    127 : "At {0} {1} the agent logged this warning: {2}. Please check out {3} for "\
-          "more information.",
+    126 : "Found errors in log file {0}: {1}",
+    127 : "Found warnings in log file {0}: {1}",
     128 : "Heartbeats are failing to send data to the workspace.",
     129 : "Machine registered with more than one log analytics workspace. List of "\
           "workspaces: {0}",
@@ -76,7 +74,39 @@ tsg_error_codes = {
     137 : "Couldn't find either 'rsyslog' or 'syslogng' on machine. Please download "\
           "one of the two services and try again.",
     138 : "{0} current status is the following: '{1}'. Please run the command 'systemctl "\
-          "status {0}' for more information."
+          "status {0}' for more information.",
+    139 : "Custom log pos file {0} contains a different path to the custom log than {1}."\
+          "Please see {2} and {0} for more information.",
+    140 : "Custom log {0} has unique number '0x{1}', but pos file {2} has unique number "\
+          "'0x{3}'. Please see {4} and {2} for more information.",
+    141 : "Ran into the following error when trying to see if OMI has high CPU: \n  {0}",
+    142 : # TODO: figure out how to word this error
+    143 : "Your version of nss-pem is slightly out of date, causing OMI to run at 100% CPU. "\
+          "Please run the below command to upgrade the nss-pem package:\n"\
+          "\n  $ sudo yum upgrade upgrade nss-pem\n\n"\
+          "If nss-pem is not available for upgrade, then please instead downgrade curl using this command:\n"\
+          "\n  $ sudo yum downgrade curl libcurl\n\n"\
+          "After either option, please restart OMI using this command:\n"\
+          "\n  $ sudo scxadmin -restart\n\n"\
+          "You can read more about how to fix this specific bug by going to:\n"\
+          "\n    https://github.com/microsoft/OMS-Agent-for-Linux/blob/master/docs/"\
+                    "Troubleshooting.md#i-see-omiagent-using-100-cpu",
+    144 : "There seems to be an issue similar to a common issue involving OMI agent using "\
+          "100% CPU. Please check the below link for more information:\n"\
+          "\n    https://github.com/microsoft/OMS-Agent-for-Linux/blob/master/docs/"\
+                    "Troubleshooting.md#i-see-omiagent-using-100-cpu",
+    145 : "Ran into the following error when trying to run slabtop: \n  {0}",
+    146 : # TODO: figure out how to word this error
+    147 : "Your version of nss-softokn is slightly out of date, causing an issue with "\
+          "bloating the dentry cache. Please upgrade your version to nss-softokn-3.14.3-12.el6 "\
+          "or newer, and ensure that the NSS_SDB_USE_CACHE environment variable is set to 'yes'. "\
+          "Please check the below link for more information:\n"\
+          "\n    https://bugzilla.redhat.com/show_bug.cgi?format=multiple&id=1044666",
+    148 : "There appears to be an issue in NSS, which resulted in bloating the dentry cache. "\
+          "Please set the NSS_SDB_USE_CACHE environment variable to 'yes'. You can check the "\
+          "below link for more information:\n"\
+          "\n    https://github.com/microsoft/OMS-Agent-for-Linux/blob/master/docs/"\
+                    "Troubleshooting.md#i-see-omiagent-using-100-cpu","
 
 }  # TODO: keep up to date with error codes onenote
 
