@@ -106,8 +106,11 @@ def run_tsg():
 
     print("================================================================================")
     if (success == 0):
-        print("No errors were found.")
-        # TODO: add smth about how couldn't find any errors, then collect the logs and give them to user and tell them to make ticket
+        print("No errors were found. Please follow the link below in order to download the OMS \n"\
+            "Linux Agent Log Collector tool:\n"\
+            "\n    https://github.com/microsoft/OMS-Agent-for-Linux/blob/master/tools/LogCollector/"\
+                        "OMS_Linux_Agent_Log_Collector.md\n\n"\
+            "And run the Log Collector in order to grab logs pertinent to debugging.")
         return
     elif (success == 1):
         return
