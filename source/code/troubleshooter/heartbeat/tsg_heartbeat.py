@@ -199,6 +199,7 @@ def check_heartbeat(prev_success=0):
             return check_connection(err_codes=False, prev_success=101)
         # other issue
         else:
+            # TODO: have warning print then continue
             return print_errors(checked_log_hb)
     
     return success

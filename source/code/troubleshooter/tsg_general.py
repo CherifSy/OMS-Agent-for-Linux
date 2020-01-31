@@ -5,7 +5,7 @@ from install.tsg_install           import check_installation
 from connect.tsg_connect           import check_connection
 from heartbeat.tsg_heartbeat       import check_heartbeat
 from high_cpu_mem.tsg_high_cpu_mem import check_high_cpu_memory
-from syslog.tsg_syslog             import check_syslog
+from syslog1.tsg_syslog            import check_syslog
 from custom_logs.tsg_custom_logs   import check_custom_logs
 
 # check to make sure the user is running as root
@@ -50,7 +50,10 @@ def check_all():
     if (checked_hb != 0):
         return checked_hb
 
-    # TODO: fill in 4 when implemented
+    print("================================================================================")
+    checked_highcpumem = check_high_cpu_memory()
+    if (checked_highcpumem != 0):
+        return checked_highcpumem
 
     print("================================================================================")
     checked_syslog = check_syslog()
@@ -58,7 +61,7 @@ def check_all():
         return checked_syslog
 
     print("================================================================================")
-    checked_cl = check_custom_logs(requested=False)
+    checked_cl = check_custom_logs()
     if (checked_cl != 0):
         return checked_cl
 
@@ -87,9 +90,9 @@ def run_tsg():
         '1': check_installation,
         '2': check_connection,
         '3': check_heartbeat,
-        '4': unimplemented,
-        '5': unimplemented,
-        '6': unimplemented,
+        '4': check_high_cpu_memory,
+        '5': check_syslog,
+        '6': check_custom_logs,
         'A': check_all
     }
     issue = get_input("Please select an option",\
@@ -106,11 +109,20 @@ def run_tsg():
 
     print("================================================================================")
     if (success == 0):
-        print("No errors were found. Please follow the link below in order to download the OMS \n"\
-            "Linux Agent Log Collector tool:\n"\
+        print("No errors were found. If you still have an issue, please follow the link below \n"\
+            "in order to download the OMS Linux Agent Log Collector tool:\n"\
             "\n    https://github.com/microsoft/OMS-Agent-for-Linux/blob/master/tools/LogCollector/"\
                         "OMS_Linux_Agent_Log_Collector.md\n\n"\
-            "And run the Log Collector in order to grab logs pertinent to debugging.")
+            "And run the Log Collector in order to grab logs pertinent to debugging.\n"\
+            "In addition, please include the following information:\n"\
+            "  - Azure Subscription ID where the Log Analytics Workspace is located\n"\
+            "  - Workspace ID the agent has been onboarded to\n"\
+            "  - Workspace Name\n"\
+            "  - Region Workspace is located\n"\
+            "  - Pricing Tier assigned to the Workspace\n"\
+            "(The above points can all be found in Azure Support Center.)\n"\
+            "  - Linux Distribution on the VM\n"\
+            "  - Log Analytics Agent Version")
         return
     elif (success == 1):
         return

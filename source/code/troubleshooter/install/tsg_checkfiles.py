@@ -275,10 +275,8 @@ def check_filesystem():
     for df in datafiles:
         # skip if wrong distro
         if (tsginfo_lookup('OS_READABLE_ID') == 'rhel' and df == 'wid_files_ubuntu.data'):
-            print("TEST REMOVE WHEN DONE: skipping wrong distro")
             continue
         if (tsginfo_lookup('OS_READABLE_ID') == 'ubuntu' and df == 'wid_files_redhat.data'):
-            print("TEST REMOVE WHEN DONE: skipping wrong distro")
             continue
         
         variables = dict()  # {var name : content}

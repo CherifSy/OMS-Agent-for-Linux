@@ -4,18 +4,10 @@ import subprocess
 from tsg_errors import tsg_error_info
 from tsg_info   import tsginfo_lookup
 
-script_dir = "files" #TODO: change when actually putting it in correct place
-script_file = os.path.join(script_dir, 'omiHighCPUDiagnostics.sh')
+script_dir = "./files" #TODO: change when actually putting it in correct place
+script_file = os.path.join(script_dir, 'omiHighCPUDiagnosticsTSG.sh')
 tsg_output_file = os.path.join(script_dir, 'tsg_omiagent_trace')
-output_file = os.path.join(script_dir, 'omiagent_trace')
-
-
-
-def create_ticket():
-    # TODO: tell user what's going on
-    # TODO: include omiagent_trace, profile #s, distro, oms/omi versions; in some file
-    return 142
-
+output_file = os.path.join(script_dir, 'omiagent_trace')    
 
 
 
@@ -36,7 +28,7 @@ def get_pkg_ver(pkg):
                 # check info
                 if (parsed_line[0].startswith('Name') and parsed_line[1] != pkg):
                     # wrong package
-                    return create_ticket()
+                    return None
                 if (parsed_line[0].startswith('Version')):
                     version = parsed_line[1]
                     continue
@@ -56,7 +48,7 @@ def get_pkg_ver(pkg):
                 # check info
                 if (parsed_line[0] == 'Package' and parsed_line[1] != pkg):
                     # wrong package
-                    return create_ticket()
+                    return None
                 if (parsed_line[0] == 'Version'):
                     version = parsed_line[1]
                     break
@@ -76,7 +68,7 @@ def check_output_file():
     with open(tsg_output_file, 'r') as f:
         lines = f.readlines()
         # no threads over 80% threshold
-        if (lines[0] == "No threads with high CPU utilization."):
+        if (lines[0] == "No threads with high CPU utilization.\n"):
             return 0
         # some threads over 80% threshold, check permissions
         else:
@@ -88,7 +80,8 @@ def check_output_file():
                 if ((parsed_line[-1] == 'omiagent') and (parsed_line[1] == 'omsagent')):
                     nss_ver = get_pkg_ver('nss-pem')
                     if (nss_ver == None):
-                        return create_ticket()
+                        tsg_error_info.append(('nss-pem',))
+                        return 152
                     # check nss-pem version
                     if (nss_ver == '1.0.3-5.el7'):
                         return 143
@@ -96,14 +89,15 @@ def check_output_file():
                         return 144
 
             # OMI running itself too hot
-            return create_ticket()
+            tsg_error_info.append((output_file,))
+            # TODO: include profile #s, distro, oms/omi versions; in some file
+            return 142
 
 
 
 
 def check_omi_cpu():
     # Run script
-    print("Checking if OMI is at 100% CPU...")
     try:
         script_output = subprocess.check_output(['bash',script_file,'--runtime-in-min','1',\
                             '--cpu-threshold','80'], universal_newlines=True, stderr=subprocess.STDOUT)

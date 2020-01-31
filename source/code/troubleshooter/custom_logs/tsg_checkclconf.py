@@ -78,7 +78,7 @@ def check_customlog_conf():
             # inside custom log
             elif (in_log):
                 parsed_line = cl_line.lstrip('  ').split(' ')
-                curr_log(parsed_line[0]) = parsed_line[1]
+                curr_log[parsed_line[0]] = parsed_line[1]
                 continue
 
     return 0

@@ -15,8 +15,13 @@ err_summary = []
 
 
 
+# set of all errors which are actually warnings
+warnings = {127, 151}
+
 # dictionary correlating error codes to error messages
 tsg_error_codes = {
+    100 : "Couldn't access {0} due to inadequate permissions. Please run the troubleshooter "\
+          "as root in order to allow access.",
     101 : "Please go through the output above to find the errors caught by the troubleshooter.",
     102 : "Couldn't get if CPU is 32-bit or 64-bit.",
     103 : "This version of {0} ({1}) is not supported. For {2} machines, please download {3}.",
@@ -80,7 +85,7 @@ tsg_error_codes = {
     140 : "Custom log {0} has unique number '0x{1}', but pos file {2} has unique number "\
           "'0x{3}'. Please see {4} and {2} for more information.",
     141 : "Ran into the following error when trying to see if OMI has high CPU: \n  {0}",
-    142 : # TODO: figure out how to word this error
+    142 : "OMI appears to be running itself at >80% CPU. Please check out {0} for more information.",
     143 : "Your version of nss-pem is slightly out of date, causing OMI to run at 100% CPU. "\
           "Please run the below command to upgrade the nss-pem package:\n"\
           "\n  $ sudo yum upgrade upgrade nss-pem\n\n"\
@@ -96,7 +101,8 @@ tsg_error_codes = {
           "\n    https://github.com/microsoft/OMS-Agent-for-Linux/blob/master/docs/"\
                     "Troubleshooting.md#i-see-omiagent-using-100-cpu",
     145 : "Ran into the following error when trying to run slabtop: \n  {0}",
-    146 : # TODO: figure out how to word this error
+    146 : "Your machine has an issue with the dentry cache becoming bloated. Please check the "\
+          "top 10 caches below, sorted by cache size:\n{0}",
     147 : "Your version of nss-softokn is slightly out of date, causing an issue with "\
           "bloating the dentry cache. Please upgrade your version to nss-softokn-3.14.3-12.el6 "\
           "or newer, and ensure that the NSS_SDB_USE_CACHE environment variable is set to 'yes'. "\
@@ -106,7 +112,13 @@ tsg_error_codes = {
           "Please set the NSS_SDB_USE_CACHE environment variable to 'yes'. You can check the "\
           "below link for more information:\n"\
           "\n    https://github.com/microsoft/OMS-Agent-for-Linux/blob/master/docs/"\
-                    "Troubleshooting.md#i-see-omiagent-using-100-cpu","
+                    "Troubleshooting.md#i-see-omiagent-using-100-cpu",
+    149 : "Logrotate size limit for log {0} has invalid formatting. Please see {1} for more "\
+          "information.",
+    150 : "Logrotate isn't rotating log {0}: its current size is {1}, and it should have "\
+          "been rotated at {2}. Please see {3} for more information.",
+    151 : "File {0} has been modified {1} times in the last {2} seconds.",
+    152 : "{0} isn't installed correctly."
 
 }  # TODO: keep up to date with error codes onenote
 
@@ -255,7 +267,7 @@ def print_errors(err_code, reinstall=False, restart_oms=False, continue_tsg=Fals
     warning = False
     if (err_code == 1):
         return 1
-    if (err_code == 127):
+    if (err_code in warnings):
         warning = True
 
     err_string = tsg_error_codes[err_code]

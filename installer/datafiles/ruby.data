@@ -7319,7 +7319,7 @@ ${{RUBY_DEST}}/lib/ruby/gems/2.6.0/gems/msgpack-1.1.0/msgpack.gemspec;   ${{RUBY
 ${{RUBY_DEST}}/lib/ruby/gems/2.6.0/gems/fluentd-0.12.40/README.md;       ${{RUBY_INT}}/lib/ruby/gems/2.6.0/gems/fluentd-0.12.40/README.md; 664; root; root
 ${{RUBY_DEST}}/lib/ruby/gems/2.6.0/gems/fluentd-0.12.40/.gitignore;      ${{RUBY_INT}}/lib/ruby/gems/2.6.0/gems/fluentd-0.12.40/.gitignore; 664; root; root
 
-${{RUBY_DEST}}/lib/ruby/gems/2.6.0/gems/fluentd-0.12.40/lib/fluent/log.rb; ${{RUBY_INT}}/lib/ruby/gems/2.6.0/gems/fluentd-0.12.40/lib/fluent/log.rb; 664; root; root
+${{RUBY_DEST}}/lib/ruby/gems/2.6.0/gems/fluentd-0.12.40/lib/fluent/log.rb; ${{RUBY_INT}}/lib/ruby/gems/2.6.0/gems/fluentd-0.12.40/lib/fluent/log.rb; 644; root; root
 ${{RUBY_DEST}}/lib/ruby/gems/2.6.0/gems/fluentd-0.12.40/lib/fluent/process.rb; ${{RUBY_INT}}/lib/ruby/gems/2.6.0/gems/fluentd-0.12.40/lib/fluent/process.rb; 664; root; root
 ${{RUBY_DEST}}/lib/ruby/gems/2.6.0/gems/fluentd-0.12.40/lib/fluent/label.rb; ${{RUBY_INT}}/lib/ruby/gems/2.6.0/gems/fluentd-0.12.40/lib/fluent/label.rb; 664; root; root
 
@@ -7330,12 +7330,12 @@ ${{RUBY_DEST}}/lib/ruby/gems/2.6.0/gems/fluentd-0.12.40/lib/fluent/command/debug
 
 ${{RUBY_DEST}}/lib/ruby/gems/2.6.0/gems/fluentd-0.12.40/lib/fluent/match.rb; ${{RUBY_INT}}/lib/ruby/gems/2.6.0/gems/fluentd-0.12.40/lib/fluent/match.rb; 664; root; root
 ${{RUBY_DEST}}/lib/ruby/gems/2.6.0/gems/fluentd-0.12.40/lib/fluent/version.rb; ${{RUBY_INT}}/lib/ruby/gems/2.6.0/gems/fluentd-0.12.40/lib/fluent/version.rb; 664; root; root
-${{RUBY_DEST}}/lib/ruby/gems/2.6.0/gems/fluentd-0.12.40/lib/fluent/agent.rb; ${{RUBY_INT}}/lib/ruby/gems/2.6.0/gems/fluentd-0.12.40/lib/fluent/agent.rb; 664; root; root
+${{RUBY_DEST}}/lib/ruby/gems/2.6.0/gems/fluentd-0.12.40/lib/fluent/agent.rb; ${{RUBY_INT}}/lib/ruby/gems/2.6.0/gems/fluentd-0.12.40/lib/fluent/agent.rb; 644; root; root
 ${{RUBY_DEST}}/lib/ruby/gems/2.6.0/gems/fluentd-0.12.40/lib/fluent/load.rb; ${{RUBY_INT}}/lib/ruby/gems/2.6.0/gems/fluentd-0.12.40/lib/fluent/load.rb; 664; root; root
 ${{RUBY_DEST}}/lib/ruby/gems/2.6.0/gems/fluentd-0.12.40/lib/fluent/supervisor.rb; ${{RUBY_INT}}/lib/ruby/gems/2.6.0/gems/fluentd-0.12.40/lib/fluent/supervisor.rb; 664; root; root
 ${{RUBY_DEST}}/lib/ruby/gems/2.6.0/gems/fluentd-0.12.40/lib/fluent/system_config.rb; ${{RUBY_INT}}/lib/ruby/gems/2.6.0/gems/fluentd-0.12.40/lib/fluent/system_config.rb; 664; root; root
 ${{RUBY_DEST}}/lib/ruby/gems/2.6.0/gems/fluentd-0.12.40/lib/fluent/input.rb; ${{RUBY_INT}}/lib/ruby/gems/2.6.0/gems/fluentd-0.12.40/lib/fluent/input.rb; 664; root; root
-${{RUBY_DEST}}/lib/ruby/gems/2.6.0/gems/fluentd-0.12.40/lib/fluent/plugin.rb; ${{RUBY_INT}}/lib/ruby/gems/2.6.0/gems/fluentd-0.12.40/lib/fluent/plugin.rb; 664; root; root
+${{RUBY_DEST}}/lib/ruby/gems/2.6.0/gems/fluentd-0.12.40/lib/fluent/plugin.rb; ${{RUBY_INT}}/lib/ruby/gems/2.6.0/gems/fluentd-0.12.40/lib/fluent/plugin.rb; 644; root; root
 ${{RUBY_DEST}}/lib/ruby/gems/2.6.0/gems/fluentd-0.12.40/lib/fluent/rpc.rb; ${{RUBY_INT}}/lib/ruby/gems/2.6.0/gems/fluentd-0.12.40/lib/fluent/rpc.rb; 664; root; root
 ${{RUBY_DEST}}/lib/ruby/gems/2.6.0/gems/fluentd-0.12.40/lib/fluent/status.rb; ${{RUBY_INT}}/lib/ruby/gems/2.6.0/gems/fluentd-0.12.40/lib/fluent/status.rb; 664; root; root
 ${{RUBY_DEST}}/lib/ruby/gems/2.6.0/gems/fluentd-0.12.40/lib/fluent/mixin.rb; ${{RUBY_INT}}/lib/ruby/gems/2.6.0/gems/fluentd-0.12.40/lib/fluent/mixin.rb; 664; root; root
@@ -7347,7 +7347,7 @@ ${{RUBY_DEST}}/lib/ruby/gems/2.6.0/gems/fluentd-0.12.40/lib/fluent/output.rb; ${
 ${{RUBY_DEST}}/lib/ruby/gems/2.6.0/gems/fluentd-0.12.40/lib/fluent/test.rb; ${{RUBY_INT}}/lib/ruby/gems/2.6.0/gems/fluentd-0.12.40/lib/fluent/test.rb; 664; root; root
 ${{RUBY_DEST}}/lib/ruby/gems/2.6.0/gems/fluentd-0.12.40/lib/fluent/event.rb; ${{RUBY_INT}}/lib/ruby/gems/2.6.0/gems/fluentd-0.12.40/lib/fluent/event.rb; 664; root; root
 ${{RUBY_DEST}}/lib/ruby/gems/2.6.0/gems/fluentd-0.12.40/lib/fluent/buffer.rb; ${{RUBY_INT}}/lib/ruby/gems/2.6.0/gems/fluentd-0.12.40/lib/fluent/buffer.rb; 664; root; root
-${{RUBY_DEST}}/lib/ruby/gems/2.6.0/gems/fluentd-0.12.40/lib/fluent/root_agent.rb; ${{RUBY_INT}}/lib/ruby/gems/2.6.0/gems/fluentd-0.12.40/lib/fluent/root_agent.rb; 664; root; root
+${{RUBY_DEST}}/lib/ruby/gems/2.6.0/gems/fluentd-0.12.40/lib/fluent/root_agent.rb; ${{RUBY_INT}}/lib/ruby/gems/2.6.0/gems/fluentd-0.12.40/lib/fluent/root_agent.rb; 644; root; root
 ${{RUBY_DEST}}/lib/ruby/gems/2.6.0/gems/fluentd-0.12.40/lib/fluent/engine.rb; ${{RUBY_INT}}/lib/ruby/gems/2.6.0/gems/fluentd-0.12.40/lib/fluent/engine.rb; 664; root; root
 ${{RUBY_DEST}}/lib/ruby/gems/2.6.0/gems/fluentd-0.12.40/lib/fluent/formatter.rb; ${{RUBY_INT}}/lib/ruby/gems/2.6.0/gems/fluentd-0.12.40/lib/fluent/formatter.rb; 664; root; root
 ${{RUBY_DEST}}/lib/ruby/gems/2.6.0/gems/fluentd-0.12.40/lib/fluent/timezone.rb; ${{RUBY_INT}}/lib/ruby/gems/2.6.0/gems/fluentd-0.12.40/lib/fluent/timezone.rb; 664; root; root
@@ -7385,7 +7385,7 @@ ${{RUBY_DEST}}/lib/ruby/gems/2.6.0/gems/fluentd-0.12.40/lib/fluent/plugin/in_for
 ${{RUBY_DEST}}/lib/ruby/gems/2.6.0/gems/fluentd-0.12.40/lib/fluent/plugin/filter_grep.rb; ${{RUBY_INT}}/lib/ruby/gems/2.6.0/gems/fluentd-0.12.40/lib/fluent/plugin/filter_grep.rb; 664; root; root
 ${{RUBY_DEST}}/lib/ruby/gems/2.6.0/gems/fluentd-0.12.40/lib/fluent/plugin/in_status.rb; ${{RUBY_INT}}/lib/ruby/gems/2.6.0/gems/fluentd-0.12.40/lib/fluent/plugin/in_status.rb; 664; root; root
 ${{RUBY_DEST}}/lib/ruby/gems/2.6.0/gems/fluentd-0.12.40/lib/fluent/plugin/in_tcp.rb; ${{RUBY_INT}}/lib/ruby/gems/2.6.0/gems/fluentd-0.12.40/lib/fluent/plugin/in_tcp.rb; 664; root; root
-${{RUBY_DEST}}/lib/ruby/gems/2.6.0/gems/fluentd-0.12.40/lib/fluent/plugin/in_monitor_agent.rb; ${{RUBY_INT}}/lib/ruby/gems/2.6.0/gems/fluentd-0.12.40/lib/fluent/plugin/in_monitor_agent.rb; 664; root; root
+${{RUBY_DEST}}/lib/ruby/gems/2.6.0/gems/fluentd-0.12.40/lib/fluent/plugin/in_monitor_agent.rb; ${{RUBY_INT}}/lib/ruby/gems/2.6.0/gems/fluentd-0.12.40/lib/fluent/plugin/in_monitor_agent.rb; 644; root; root
 ${{RUBY_DEST}}/lib/ruby/gems/2.6.0/gems/fluentd-0.12.40/lib/fluent/plugin/string_util.rb; ${{RUBY_INT}}/lib/ruby/gems/2.6.0/gems/fluentd-0.12.40/lib/fluent/plugin/string_util.rb; 664; root; root
 ${{RUBY_DEST}}/lib/ruby/gems/2.6.0/gems/fluentd-0.12.40/lib/fluent/plugin/out_roundrobin.rb; ${{RUBY_INT}}/lib/ruby/gems/2.6.0/gems/fluentd-0.12.40/lib/fluent/plugin/out_roundrobin.rb; 664; root; root
 ${{RUBY_DEST}}/lib/ruby/gems/2.6.0/gems/fluentd-0.12.40/lib/fluent/plugin/in_syslog.rb; ${{RUBY_INT}}/lib/ruby/gems/2.6.0/gems/fluentd-0.12.40/lib/fluent/plugin/in_syslog.rb; 644; root; root
@@ -9966,7 +9966,7 @@ ${{RUBY_DEST}}/lib/ruby/gems/2.6.0/extensions/${{RUBY_ARCH}}/2.6.0-static/oj-3.7
 
 ${{RUBY_DEST}}/lib/pkgconfig/ruby-2.6.pc;                                ${{RUBY_INT}}/lib/pkgconfig/ruby-2.6.pc;                         644; root; root
 
-${{RUBY_DEST}}/lib/libjemalloc.so.2;                                     ${{RUBY_INT}}/lib/libjemalloc.so.2;                              644; root; root
+${{RUBY_DEST}}/lib/libjemalloc.so.2;                                     ${{RUBY_INT}}/lib/libjemalloc.so.2;                              755; root; root
 ${{RUBY_DEST}}/lib/libruby-static.a;                                     ${{RUBY_INT}}/lib/libruby-static.a;                              644; root; root
 
 ${{RUBY_DEST}}/bin/ri;                                                   ${{RUBY_INT}}/bin/ri;                                            755; root; root

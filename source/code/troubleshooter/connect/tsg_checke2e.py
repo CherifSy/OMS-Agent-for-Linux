@@ -30,7 +30,7 @@ def check_e2e():
     if (no_skip_all.lower() in ['y','yes']):
         for source in sources:
             # TODO: fix query to what Henry suggested
-            query = "{0} | where Computer == '{1}' | take 1".format(source, hostname)
+            query = "{0} | where Computer == '{1}' | sort by TimeGenerated desc | take 1".format(source, hostname)
             print("--------------------------------------------------------------------------------")
             print(" Please run this query:")
             print("\n    {0}\n".format(query))
