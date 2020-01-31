@@ -8,10 +8,10 @@ from install.tsg_checkoms import comp_versions_ge
 def check_strace():
     dne_errs = 0
     strace_errors = subprocess.Popen(['strace','-f','-e','trace=access','curl',"'https://www.google.com'"],\
-                        encoding='utf-8', stderr=subprocess.PIPE).communicate()[1]
+                        stderr=subprocess.PIPE).communicate()[1]
     # count of doesnotexist errors
-    for line in strace_errors.split('\n'):
-        if (line.endswith('(No such file or directory)')):
+    for line in (strace_errors.decode('utf8').split('\n')):
+        if (line.endswith('= -1 ENOENT (No such file or directory)')):
             dne_errs += 1
     return (dne_errs <= 300)
 

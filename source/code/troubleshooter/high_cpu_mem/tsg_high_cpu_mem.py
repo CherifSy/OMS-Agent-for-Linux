@@ -53,7 +53,7 @@ def check_high_cpu_memory(prev_success=0):
         return print_errors(checked_logrot)
 
     # check CPU capacity
-    print("Checking if OMI is at 100% CPU...")
+    print("Checking if OMI is at 100% CPU (may take some time)...")
     checked_highcpu = check_omi_cpu()
     if (checked_highcpu != 0):
         return print_errors(checked_highcpu)
