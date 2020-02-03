@@ -50,8 +50,9 @@ def check_log_heartbeat(workspace):
         # filter out errors
         parsed_log_errs = list(filter(lambda x : (x[3]) == '[error]', parsed_log_lines))
         if (len(parsed_log_errs) > 0):
-            log_errs = '\n  ' + parsed_log_errs.join('\n  ')
-            tsg_error_info.append((log_errs,))
+            log_err_lines = list(map(lambda x : x[-1], parsed_log_errs))
+            log_errs = '\n  ' + ('\n  '.join(log_err_lines))
+            tsg_error_info.append((log_path, log_errs))
             return 126
 
         # filter warnings
@@ -61,8 +62,9 @@ def check_log_heartbeat(workspace):
             if (len(hb_fail_logs) > 0):
                 return 128
             else:
-                log_warns = '\n  ' + parsed_log_warns.join('\n  ')
-                tsg_error_info.append((log_warns,))
+                log_warn_lines = list(map(lambda x : x[-1], parsed_log_warns))
+                log_warns = '\n  ' + ('\n  '.join(log_warn_lines))
+                tsg_error_info.append((log_path, log_warns))
                 return 127
 
         # logs show no errors or warnings

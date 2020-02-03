@@ -1,4 +1,5 @@
 import re
+import ssl
 import urllib
 
 from tsg_info                import tsg_info, update_omsadmin
@@ -26,8 +27,9 @@ def get_oms_version():
 
 # get most recent OMS version released
 def get_curr_oms_version():
+    omsagent_url = "https://raw.github.com/microsoft/OMS-Agent-for-Linux/master/docs/OMS-Agent-for-Linux.md"
     try:
-        doc_file = urlopen("https://raw.github.com/microsoft/OMS-Agent-for-Linux/master/docs/OMS-Agent-for-Linux.md")
+        doc_file = urlopen(omsagent_url)
         for line in doc_file.readlines():
             line = line.decode('utf8')
             if line.startswith("omsagent | "):
@@ -35,11 +37,14 @@ def get_curr_oms_version():
                 tsg_info['UPDATED_OMS_VERSION'] = parsed_line[1]
                 return parsed_line[1]
         return None
-    except IOError:
+    except IOError as e:
+        print(e)
+        print(e.strerror)
         checked_internet = check_internet_connect()
         if (checked_internet != 0):
             print_errors(checked_internet, reinstall=False)
         else:
+            tsg_error_info.append((omsagent_url,))
             print_errors(120, reinstall=False)
         return None
 
