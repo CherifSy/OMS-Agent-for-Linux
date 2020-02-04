@@ -14,3 +14,4 @@
 # git ignore for troubleshooter
 /source/code/troubleshooter/dist
 /source/code/troubleshooter/build
+/test/code/troubleshooter
