@@ -16,7 +16,7 @@ err_summary = []
 
 
 # set of all errors which are actually warnings
-warnings = {127, 151}
+warnings = {115, 127, 151}
 
 # dictionary correlating error codes to error messages
 tsg_error_codes = {
