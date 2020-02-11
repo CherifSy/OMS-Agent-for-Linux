@@ -1,7 +1,8 @@
 import os
 import subprocess
 
-from tsg_errors           import tsg_error_info, ask_onboarding_error_codes, print_errors
+from tsg_errors           import tsg_error_info, ask_onboarding_error_codes, is_error, \
+                                 print_errors
 from install.tsg_install  import check_installation
 from install.tsg_checkoms import get_oms_version
 from .tsg_checkendpts     import check_internet_connect, check_agent_service_endpt, \
@@ -49,7 +50,7 @@ def check_connection(err_codes=True, prev_success=0):
     # check omsadmin.conf
     print("Checking if omsadmin.conf created correctly...")
     checked_omsadmin = check_omsadmin()
-    if (checked_omsadmin != 0):
+    if (is_error(checked_omsadmin)):
         print_errors(checked_omsadmin)
         print("Running the installation part of the troubleshooter in order to find the issue...")
         print("================================================================================")
@@ -58,26 +59,34 @@ def check_connection(err_codes=True, prev_success=0):
     # check general internet connectivity
     print("Checking if machine is connected to the internet...")
     checked_internet_connect = check_internet_connect()
-    if (checked_internet_connect != 0):
+    if (is_error(checked_internet_connect)):
         return print_errors(checked_internet_connect)
+    else:
+        success = print_errors(checked_internet_connect)
 
     # check if agent service endpoint connected
     print("Checking if agent service endpoint is connected...")
     checked_as_endpt = check_agent_service_endpt()
-    if (checked_as_endpt != 0):
+    if (is_error(checked_as_endpt)):
         return print_errors(checked_as_endpt)
+    else:
+        success = print_errors(checked_as_endpt)
 
     # check if log analytics endpoints connected
     print("Checking if log analytics endpoints are connected...")
     checked_la_endpts = check_log_analytics_endpts()
-    if (checked_la_endpts != 0):
+    if (is_error(checked_la_endpts)):
         return print_errors(checked_la_endpts)
+    else:
+        success = print_errors(checked_la_endpts)
 
     # check if queries are successful
     print("Checking if queries are successful...")
     checked_e2e = check_e2e()
-    if (checked_e2e != 0):
+    if (is_error(checked_e2e)):
         return print_errors(checked_e2e)
+    else:
+        success = print_errors(checked_e2e)
         
     return success
 

@@ -2,7 +2,7 @@ import os
 import subprocess
 
 from tsg_info        import update_pkg_manager
-from tsg_errors      import tsg_error_info, ask_install_error_codes, print_errors
+from tsg_errors      import tsg_error_info, is_error, ask_install_error_codes, print_errors
 from .tsg_checkos    import check_os
 from .tsg_checkoms   import check_oms
 from .tsg_checkfiles import check_filesystem
@@ -105,51 +105,63 @@ def check_installation(err_codes=True, prev_success=0):
     # check OS
     print("Checking if running a supported OS version...")
     checked_os = check_os()
-    if (checked_os != 0):
+    if (is_error(checked_os)):
         return print_errors(checked_os)
+    else:
+        success = print_errors(checked_os)
     
     # check space available
     print("Checking if enough disk space is available...")
     checked_space = check_space()
-    if (checked_space != 0):
+    if (is_error(checked_space)):
         return print_errors(checked_space)
+    else:
+        success = print_errors(checked_space)
 
     # check package manager
     print("Checking if machine has a supported package manager...")
     checked_pkg_manager = update_pkg_manager()
-    if (checked_pkg_manager != 0):
+    if (is_error(checked_pkg_manager)):
         return print_errors(checked_pkg_manager)
+    else:
+        success = print_errors(checked_pkg_manager)
     
     # check packages are installed
     print("Checking if packages installed correctly...")
     checked_packages = check_packages()
-    if (checked_packages != 0):
+    if (is_error(checked_packages)):
         return print_errors(checked_packages)
+    else:
+        success = print_errors(checked_packages)
 
     # check OMS version
     print("Checking if running a supported version of OMS...")
     checked_oms = check_oms()
-    if (checked_oms != 0):
+    if (is_error(checked_oms)):
         return print_errors(checked_oms)
+    else:
+        success = print_errors(checked_oms)
 
     # check all files
     print("Checking if all files installed correctly (may take some time)...")
     checked_files = check_filesystem()
-    if (checked_files != 0):
+    if (is_error(checked_files)):
         return print_errors(checked_files)
+    else:
+        success = print_errors(checked_files)
 
     # check certs
     print("Checking certificate and RSA key are correct...")
     # check cert
     checked_cert = check_cert()
     if (checked_cert != 0):
-        print_errors(checked_cert)
+        success = print_errors(checked_cert)
     # check key
     checked_key = check_key()
     if (checked_key != 0):
-        print_errors(checked_key)
+        success = print_errors(checked_key)
     # return if at least one is false
-    if (checked_cert or checked_key):
+    if (is_error(checked_cert) or is_error(checked_key)):
         return 101
     
     return success

@@ -57,8 +57,10 @@ def check_custom_logs(prev_success=0):
     # check customlog.conf
     print("Checking for custom log configuration files...")
     checked_clconf = check_customlog_conf()
-    if (checked_clconf != 0):
+    if (is_error(checked_clconf)):
         return print_errors(checked_clconf)
+    else:
+        success = print_errors(checked_clconf)
 
     return success
 

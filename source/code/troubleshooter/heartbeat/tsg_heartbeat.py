@@ -2,7 +2,7 @@ import re
 import subprocess
 
 from tsg_info             import tsginfo_lookup
-from tsg_errors           import tsg_error_info, print_errors
+from tsg_errors           import tsg_error_info, is_error, print_errors
 from install.tsg_checkoms import get_oms_version
 from install.tsg_install  import check_installation
 from connect.tsg_connect  import check_connection
@@ -171,8 +171,10 @@ def check_heartbeat(prev_success=0):
     # check if running multi-homing
     print("Checking if omsagent is trying to run multihoming...")
     checked_multihoming = check_multihoming(workspace)
-    if (checked_multihoming != 0):
+    if (is_error(checked_multihoming)):
         return print_errors(checked_multihoming)
+    else:
+        success = print_errors(checked_multihoming)
 
     # check if other agents are sending heartbeats
     # TODO
@@ -184,13 +186,15 @@ def check_heartbeat(prev_success=0):
         # try starting omsagent
         # TODO: find better way of doing this, check to see if agent is stopped / grab results
         checked_omsagent_running = start_omsagent(workspace)
-    if (checked_omsagent_running != 0):
+    if (is_error(checked_omsagent_running)):
         return print_errors(checked_omsagent_running)
+    else:
+        success = print_errors(checked_omsagent_running)
 
     # check if omsagent.log finds any heartbeat errors
     print("Checking for errors in omsagent.log...")
     checked_log_hb = check_log_heartbeat(workspace)
-    if (checked_log_hb != 0):
+    if (is_error(checked_log_hb)):
         # connection issue
         if (checked_log_hb == 128):
             print_errors(checked_log_hb)
@@ -199,8 +203,9 @@ def check_heartbeat(prev_success=0):
             return check_connection(err_codes=False, prev_success=101)
         # other issue
         else:
-            # TODO: have warning print then continue
             return print_errors(checked_log_hb)
+    else:
+        success = print_errors(checked_log_hb)
     
     return success
 

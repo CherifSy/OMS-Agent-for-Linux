@@ -1,5 +1,5 @@
 from tsg_info                import tsginfo_lookup
-from tsg_errors              import print_errors
+from tsg_errors              import is_error, print_errors
 from install.tsg_checkoms    import get_oms_version
 from install.tsg_install     import check_installation
 from connect.tsg_checkendpts import check_log_analytics_endpts
@@ -41,7 +41,7 @@ def check_syslog(prev_success=0):
     # check for syslog.conf and 95-omsagent.conf
     print("Checking for syslog configuration files...")
     checked_conf_files = check_conf_files()
-    if (checked_conf_files != 0):
+    if (is_error(checked_conf_files)):
         if (checked_conf_files in [111,114]):
             print_errors(checked_conf_files)
             print("Running the installation part of the troubleshooter in order to find the issue...")
@@ -49,12 +49,16 @@ def check_syslog(prev_success=0):
             return check_installation(err_codes=False, prev_success=101)
         else:
             return print_errors(checked_conf_files)
+    else:
+        success = print_errors(checked_conf_files)
 
     # check rsyslog / syslogng running
     print("Checking if machine has rsyslog or syslogng running...")
     checked_services = check_services()
-    if (checked_services != 0):
+    if (is_error(checked_services)):
         return print_errors(checked_services)
+    else:
+        success = print_errors(checked_services)
 
     return success
         

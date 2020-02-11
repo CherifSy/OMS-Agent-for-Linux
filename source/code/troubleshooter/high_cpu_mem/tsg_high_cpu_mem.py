@@ -1,4 +1,4 @@
-from tsg_errors              import print_errors
+from tsg_errors              import is_error, print_errors
 from tsg_info                import tsginfo_lookup
 from install.tsg_checkoms    import get_oms_version
 from install.tsg_install     import check_installation
@@ -40,6 +40,7 @@ def check_high_cpu_memory(prev_success=0):
         print("================================================================================")
         return check_heartbeat(prev_success=101)
 
+    # TODO: decide if should keep this in or not
     # check disk space
     # print("Checking recent modifications to largest files...")
     # checked_disk_space = check_disk_space()
@@ -49,19 +50,25 @@ def check_high_cpu_memory(prev_success=0):
     # check log rotation
     print("Checking if log rotation is working correctly...")
     checked_logrot = check_log_rotation()
-    if (checked_logrot != 0):
+    if (is_error(checked_logrot)):
         return print_errors(checked_logrot)
+    else:
+        success = print_errors(checked_logrot)
 
     # check CPU capacity
     print("Checking if OMI is at 100% CPU (may take some time)...")
     checked_highcpu = check_omi_cpu()
-    if (checked_highcpu != 0):
+    if (is_error(checked_highcpu)):
         return print_errors(checked_highcpu)
+    else:
+        success = print_errors(checked_highcpu)
 
     # check slab memory / dentry cache issue
     print("Checking slab memory / dentry cache usage...")
     checked_slabmem = check_slab_memory()
-    if (checked_slabmem != 0):
+    if (is_error(checked_slabmem)):
         return print_errors(checked_slabmem)
+    else:
+        success = checked_slabmem
 
     return success
