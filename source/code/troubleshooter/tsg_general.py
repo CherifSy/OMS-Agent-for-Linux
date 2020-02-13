@@ -108,30 +108,35 @@ def run_tsg():
     success = section()
 
     print("================================================================================")
-    if (success == 0):
-        print("No errors were found. If you still have an issue, please follow the link below \n"\
-            "in order to download the OMS Linux Agent Log Collector tool:\n"\
-            "\n    https://github.com/microsoft/OMS-Agent-for-Linux/blob/master/tools/LogCollector/"\
-                        "OMS_Linux_Agent_Log_Collector.md\n\n"\
-            "And run the Log Collector in order to grab logs pertinent to debugging.\n"\
-            "In addition, please include the following information:\n"\
-            "  - Azure Subscription ID where the Log Analytics Workspace is located\n"\
-            "  - Workspace ID the agent has been onboarded to\n"\
-            "  - Workspace Name\n"\
-            "  - Region Workspace is located\n"\
-            "  - Pricing Tier assigned to the Workspace\n"\
-            "(The above points can all be found in Azure Support Center.)\n"\
-            "  - Linux Distribution on the VM\n"\
-            "  - Log Analytics Agent Version")
-        return
-    elif (success == 1):
-        return
-    else:
-        print("ERROR SUMMARY:")
+    # print out all errors/warnings
+    if (len(err_summary) > 0):
+        print("ALL ERRORS/WARNINGS ENCOUNTERED:")
         for err in err_summary:
             print("  {0}".format(err))
+    # no errors found
+    if (success == 0):
+        print("No errors were found.")
+    # user requested to exit
+    elif (success == 1):
         return
+    # error found
+    else:
+        print("Please review the errors found above.")
+    # give information to user about next steps
+    print("If you still have an issue, please follow the link below in order to download\n\"
+        "the OMS Linux Agent Log Collector tool:\n"\
+        "\n    https://github.com/microsoft/OMS-Agent-for-Linux/blob/master/tools/LogCollector/"\
+                    "OMS_Linux_Agent_Log_Collector.md\n\n"\
+        "And run the Log Collector in order to grab logs pertinent to debugging.\n"\
+        "In addition, please include the following information:\n"\
+        "  - Azure Subscription ID where the Log Analytics Workspace is located\n"\
+        "  - Workspace ID the agent has been onboarded to\n"\
+        "  - Workspace Name\n"\
+        "  - Region Workspace is located\n"\
+        "  - Pricing Tier assigned to the Workspace\n"\
+        "(The above points can all be found in Azure Support Center.)\n"\
+        "  - Linux Distribution on the VM\n"\
+        "  - Log Analytics Agent Version"
     
 
-# TODO: remove this after done testing
 run_tsg()

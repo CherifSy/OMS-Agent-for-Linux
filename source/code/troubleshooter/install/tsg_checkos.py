@@ -50,6 +50,9 @@ def check_vm_supported(vm_dist, vm_ver):
                 except IndexError:
                     vm_ver_match = False
                     break
+                except ValueError:
+                    vm_ver_match = False
+                    break
                 if (vm_ver_num is not supported_ver_num):
                     vm_ver_match = False
                     break
