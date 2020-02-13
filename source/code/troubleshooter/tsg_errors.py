@@ -126,7 +126,7 @@ tsg_error_codes = {
 
 # check if either has no error or is warning
 def is_error(err_code):
-    return err_code not in (warnings.insert(0))
+    return err_code not in (warnings.add(0))
 
 # get error codes from Troubleshooting.md
 def get_error_codes(err_type):
@@ -295,7 +295,7 @@ def print_errors(err_code, reinstall=False, restart_oms=False, continue_tsg=Fals
             print(final_err_string)
 
     if (warning):
-        return 0
+        return 2
         
     if (restart_oms):
         return ask_restart_oms()
