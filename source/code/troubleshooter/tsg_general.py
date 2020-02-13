@@ -123,7 +123,7 @@ def run_tsg():
     else:
         print("Please review the errors found above.")
     # give information to user about next steps
-    print("If you still have an issue, please follow the link below in order to download\n\"
+    print("If you still have an issue, please follow the link below in order to download\n"\
         "the OMS Linux Agent Log Collector tool:\n"\
         "\n    https://github.com/microsoft/OMS-Agent-for-Linux/blob/master/tools/LogCollector/"\
                     "OMS_Linux_Agent_Log_Collector.md\n\n"\
@@ -136,7 +136,8 @@ def run_tsg():
         "  - Pricing Tier assigned to the Workspace\n"\
         "(The above points can all be found in Azure Support Center.)\n"\
         "  - Linux Distribution on the VM\n"\
-        "  - Log Analytics Agent Version"
+        "  - Log Analytics Agent Version")
+    return
     
 
 run_tsg()
