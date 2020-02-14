@@ -47,15 +47,13 @@ def check_vm_supported(vm_dist, vm_ver):
                 try:
                     supported_ver_num = int(supported_ver_num)
                     vm_ver_num = int(vm_ver_split[idx])
-                except IndexError:
+                    if (vm_ver_num is not supported_ver_num):
+                        vm_ver_match = False
+                        break
+                except (IndexError, ValueError) as e:
                     vm_ver_match = False
                     break
-                except ValueError:
-                    vm_ver_match = False
-                    break
-                if (vm_ver_num is not supported_ver_num):
-                    vm_ver_match = False
-                    break
+                
             # check if successful in matching
             if (vm_ver_match):
                 vm_supported = True

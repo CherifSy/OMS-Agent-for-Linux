@@ -24,9 +24,18 @@ tsg_error_codes = {
           "as root in order to allow access.",
     101 : "Please go through the output above to find the errors caught by the troubleshooter.",
     102 : "Couldn't get if CPU is 32-bit or 64-bit.",
-    103 : "This version of {0} ({1}) is not supported. For {2} machines, please download {3}.",
-    104 : "{0} is not supported.",
-    105 : "Indeterminate Operating System.",
+    103 : "This version of {0} ({1}) is not supported. Please download {2}. To see all "\
+          "supported Operating Systems, please go to:\n"\
+          "\n   https://docs.microsoft.com/en-us/azure/azure-monitor/platform/"\
+          "log-analytics-agent#supported-linux-operating-systems\n",
+    104 : "{0} is not a supported Operating System. To see all supported Operating "\
+          "Systems, please go to:\n"\
+          "\n   https://docs.microsoft.com/en-us/azure/azure-monitor/platform/"\
+          "log-analytics-agent#supported-linux-operating-systems\n",
+    105 : "Coudln't determine Operating System. To see all supported Operating "\
+          "Systems, please go to:\n"\
+          "\n   https://docs.microsoft.com/en-us/azure/azure-monitor/platform/"\
+          "log-analytics-agent#supported-linux-operating-systems\n",
     106 : "There isn't enough space in directory {0} to install OMS - there needs to be at least 500MB free, "\
           "but {0} has {1}MB free. Please free up some space and try installing again.",
     107 : "This system does not have a supported package manager. Please install 'dpkg' or 'rpm' "\
@@ -126,7 +135,9 @@ tsg_error_codes = {
 
 # check if either has no error or is warning
 def is_error(err_code):
-    return err_code not in (warnings.add(0))
+    not_errs = warnings.copy()
+    not_errs.add(0)
+    return (err_code not in not_errs)
 
 # get error codes from Troubleshooting.md
 def get_error_codes(err_type):

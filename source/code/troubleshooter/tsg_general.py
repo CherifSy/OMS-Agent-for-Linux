@@ -113,6 +113,8 @@ def run_tsg():
         print("ALL ERRORS/WARNINGS ENCOUNTERED:")
         for err in err_summary:
             print("  {0}".format(err))
+        print("--------------------------------------------------------------------------------")
+        
     # no errors found
     if (success == 0):
         print("No errors were found.")
@@ -121,7 +123,7 @@ def run_tsg():
         return
     # error found
     else:
-        print("Please review the errors found above.")
+        print("Please review the errors/warnings found above.")
     # give information to user about next steps
     print("If you still have an issue, please follow the link below in order to download\n"\
         "the OMS Linux Agent Log Collector tool:\n"\
