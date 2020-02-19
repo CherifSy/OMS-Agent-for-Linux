@@ -292,7 +292,7 @@ def print_errors(err_code, reinstall=False, restart_oms=False, continue_tsg=Fals
 
     # no formatting
     if (tsg_error_info == []):
-        err_string = "ERROR: {0}".format(err_string)
+        err_string = "ERROR FOUND: {0}".format(err_string)
         err_summary.append(err_string)
         print(err_string)
     # needs input
@@ -301,14 +301,14 @@ def print_errors(err_code, reinstall=False, restart_oms=False, continue_tsg=Fals
             tup = tsg_error_info.pop(0)
             temp_err_string = err_string.format(*tup)
             if (warning):
-                final_err_string = "WARNING: {0}".format(temp_err_string)
+                final_err_string = "WARNING FOUND: {0}".format(temp_err_string)
             else:
-                final_err_string = "ERROR: {0}".format(temp_err_string)
+                final_err_string = "ERROR FOUND: {0}".format(temp_err_string)
             err_summary.append(final_err_string)
             print(final_err_string)
 
     if (warning):
-        return 2
+        return 0
         
     if (restart_oms):
         return ask_restart_oms()

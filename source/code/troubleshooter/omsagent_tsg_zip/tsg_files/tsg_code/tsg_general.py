@@ -1,6 +1,6 @@
 import os
 
-from tsg_errors                    import get_input, print_errors, err_summary
+from tsg_errors                    import is_error, get_input, print_errors, err_summary
 from install.tsg_install           import check_installation
 from connect.tsg_connect           import check_connection
 from heartbeat.tsg_heartbeat       import check_heartbeat
@@ -33,39 +33,52 @@ def unimplemented():
 
 # run through all troubleshooting scenarios
 def check_all():
+    all_success = 0
     # 1: Install
     checked_install = check_installation()
-    if (checked_install != 0):
+    if (is_error(checked_install)):
         return checked_install
+    else:
+        all_success = checked_install
     
     print("================================================================================")
     # 2: Connection
     checked_connection = check_connection()
-    if (checked_connection != 0):
+    if (is_error(checked_connection)):
         return checked_connection
+    else:
+        all_success = checked_connection
 
     print("================================================================================")
     # 3: Heartbeat
     checked_hb = check_heartbeat()
-    if (checked_hb != 0):
+    if (is_error(checked_hb)):
         return checked_hb
+    else:
+        all_success = checked_hb
 
     print("================================================================================")
     checked_highcpumem = check_high_cpu_memory()
-    if (checked_highcpumem != 0):
+    if (is_error(checked_highcpumem)):
         return checked_highcpumem
+    else:
+        all_success = checked_highcpumem
 
     print("================================================================================")
     checked_syslog = check_syslog()
-    if (checked_syslog != 0):
+    if (is_error(checked_syslog)):
         return checked_syslog
+    else:
+        all_success = checked_syslog
 
     print("================================================================================")
     checked_cl = check_custom_logs()
-    if (checked_cl != 0):
+    if (is_error(checked_cl)):
         return checked_cl
+    else:
+        all_success = checked_cl
 
-    return 0
+    return all_success
 
 
 
@@ -103,7 +116,6 @@ def run_tsg():
         print("Exiting the troubleshooter...")
         return
     section = switcher.get(issue.upper(), lambda: "Invalid input")
-    print("You have selected option: {0}".format(issue))
     print("================================================================================")
     success = section()
 
@@ -123,7 +135,7 @@ def run_tsg():
         return
     # error found
     else:
-        print("Please review the errors/warnings found above.")
+        print("Please review the errors found above.")
     # give information to user about next steps
     print("If you still have an issue, please follow the link below in order to download\n"\
         "the OMS Linux Agent Log Collector tool:\n"\
