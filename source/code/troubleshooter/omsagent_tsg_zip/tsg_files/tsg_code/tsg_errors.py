@@ -280,7 +280,7 @@ def ask_continue():
 
 
 
-def print_errors(err_code, reinstall=False, restart_oms=False, continue_tsg=False):
+def print_errors(err_code):
     if (err_code in {0,1}):
         return err_code
 
@@ -305,16 +305,10 @@ def print_errors(err_code, reinstall=False, restart_oms=False, continue_tsg=Fals
             else:
                 final_err_string = "ERROR FOUND: {0}".format(temp_err_string)
             err_summary.append(final_err_string)
-            print(final_err_string)
 
     if (warning):
+        print("WARNING(S) FOUND.")
         return 0
-        
-    if (restart_oms):
-        return ask_restart_oms()
-    elif (reinstall):
-        return ask_reinstall()
-    elif (continue_tsg):
-        return ask_continue()
     else:
+        print("ERROR(S) FOUND.")
         return 101

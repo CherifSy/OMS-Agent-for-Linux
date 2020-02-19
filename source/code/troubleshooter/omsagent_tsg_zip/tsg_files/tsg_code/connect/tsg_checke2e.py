@@ -8,7 +8,7 @@ def check_e2e():
     # get machine's hostname
     hostname = subprocess.check_output(['hostname'], universal_newlines=True).rstrip('\n')
 
-    sources = ['Heartbeat', 'Syslog', 'Perf', 'ApacheAccess_CL', 'MySQL_CL', 'Custom_Log_CL']
+    sources = ['Heartbeat', 'Syslog', 'Perf']
 
     successes = []
     failures = []
@@ -18,10 +18,6 @@ def check_e2e():
           " Once there, please navigate to the 'Logs' blade, and input the queries that\n"\
           " will be printed below. If the query was successful, then you should see one\n"\
           " result; if not, then there will be no results.\n")
-    print(" WARNING: not all of these will necessarily have information! Specifically,\n"\
-          " ApacheAccess_CL, MySQL_CL, or Custom_Log_CL will have no results if you don't\n"\
-          " use Apache, MySQL, or Custom Logs, respectively. You can always skip certain\n"\
-          " queries if you don't want to test them by typing 's' or 'skip'.\n")
     # ask if user wants to skip entire query section
     no_skip_all = get_input("Do you want to continue with this section (all queries)? (y/n)",\
                             (lambda x : x in ['y','yes','n','no']),\

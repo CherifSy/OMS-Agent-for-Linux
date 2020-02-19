@@ -53,7 +53,7 @@ def check_syslog(prev_success=0):
         success = print_errors(checked_conf_files)
 
     # check rsyslog / syslogng running
-    print("Checking if machine has rsyslog or syslogng running...")
+    print("Checking if machine has rsyslog or syslog-ng running...")
     checked_services = check_services()
     if (is_error(checked_services)):
         return print_errors(checked_services)
