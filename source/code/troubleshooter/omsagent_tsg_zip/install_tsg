@@ -7,6 +7,7 @@ plugin_tsg_path="/opt/microsoft/omsagent/plugin/troubleshooter"
 if [[ $EUID -ne 0 ]]; then
     echo "This script must be run as root in order to install the troubleshooter."
     exit 1
+fi
 
 echo "Getting ready to install troubleshooter..."
 
