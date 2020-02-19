@@ -7,6 +7,8 @@ try:
 except NameError:
     pass
 
+tsg_doc_path = "/opt/microsoft/omsagent/plugin/troubleshooter/tsg_tools/Troubleshooting.md"
+
 # error info edited when error occurs
 tsg_error_info = []
 
@@ -143,7 +145,7 @@ def is_error(err_code):
 def get_error_codes(err_type):
     err_codes = {0 : "No errors found"}
     section_name = "{0} Error Codes".format(err_type)
-    with open("files/Troubleshooting.md", 'r') as ts_doc:
+    with open(tsg_doc_path, 'r') as ts_doc:
         section = None
         for line in ts_doc:
             line = line.rstrip('\n')

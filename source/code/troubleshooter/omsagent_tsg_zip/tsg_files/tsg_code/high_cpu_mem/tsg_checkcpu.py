@@ -4,7 +4,7 @@ import subprocess
 from tsg_errors import tsg_error_info
 from tsg_info   import tsginfo_lookup
 
-script_dir = "./files" #TODO: change when actually putting it in correct place
+script_dir = "/opt/microsoft/omsagent/plugin/troubleshooter/tsg_tools"
 script_file = os.path.join(script_dir, 'omiHighCPUDiagnosticsTSG.sh')
 tsg_output_file = os.path.join(script_dir, 'tsg_omiagent_trace')
 output_file = os.path.join(script_dir, 'omiagent_trace')    

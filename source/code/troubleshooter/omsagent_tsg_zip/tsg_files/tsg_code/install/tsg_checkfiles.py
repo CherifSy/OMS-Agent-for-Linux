@@ -6,7 +6,7 @@ from tsg_info      import tsginfo_lookup
 from tsg_errors    import tsg_error_info
 from .tsg_checkoms import comp_versions_ge
 
-
+dfs_path = "/opt/microsoft/omsagent/plugin/troubleshooter/tsg_tools/datafiles/"
 
 # get files/directories/links from data files
 
@@ -264,8 +264,6 @@ def check_links(links, exist_err, perms_err):
 
 def check_filesystem():
     success = 0
-
-    dfs_path = "files/datafiles"  # path to datafiles from troubleshooter
 
     # create lists to track errors
     exist_err = []

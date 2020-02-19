@@ -17,9 +17,9 @@ fi
 # copy over files
 echo "Installing troubleshooter on machine..."
 mkdir $plugin_tsg_path
-cp -r tsg_code $plugin_tsg_path
-cp -r tsg_files $plugin_tsg_path
-cp omsagent_tsg $bin_path
+cp -r tsg_files/tsg_code $plugin_tsg_path
+cp -r tsg_files/tsg_tools $plugin_tsg_path
+cp tsg_files/omsagent_tsg $bin_path
 
 echo "You can now run the troubleshooter by going to /opt/microsoft/omsagent/bin/ and running the below command:"
 echo ""
