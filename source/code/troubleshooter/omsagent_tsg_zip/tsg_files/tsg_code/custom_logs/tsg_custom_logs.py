@@ -1,5 +1,5 @@
 from tsg_info                import tsginfo_lookup
-from tsg_errors              import get_input, print_errors
+from tsg_errors              import is_error, get_input, print_errors
 from install.tsg_checkoms    import get_oms_version
 from install.tsg_install     import check_installation
 from connect.tsg_checkendpts import check_log_analytics_endpts

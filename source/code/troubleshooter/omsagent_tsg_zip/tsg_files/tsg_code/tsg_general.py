@@ -120,6 +120,7 @@ def run_tsg():
     success = section()
 
     print("================================================================================")
+    print("================================================================================")
     # print out all errors/warnings
     if (len(err_summary) > 0):
         print("ALL ERRORS/WARNINGS ENCOUNTERED:")
