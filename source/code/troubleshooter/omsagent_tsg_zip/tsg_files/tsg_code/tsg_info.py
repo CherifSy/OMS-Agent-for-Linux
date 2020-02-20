@@ -4,6 +4,13 @@ import subprocess
 
 from tsg_errors import tsg_error_info, print_errors
 
+# urlopen() in different packages in Python 2 vs 3
+try:
+    from urllib.request import urlopen
+except ImportError:
+    from urllib2 import urlopen
+
+omsagent_url = "https://raw.github.com/microsoft/OMS-Agent-for-Linux/master/docs/OMS-Agent-for-Linux.md"
 conf_path = "/etc/opt/microsoft/omsagent/conf/omsadmin.conf"
 
 tsg_info = dict()
@@ -14,7 +21,7 @@ def tsginfo_lookup(key):
     except KeyError:
         updated_tsginfo = update_tsginfo_all()
         if (updated_tsginfo != 0):
-            print_errors(updated_tsginfo, reinstall=False)
+            print_errors(updated_tsginfo)
             return None
         val = tsg_info[key]
     if (val == ''):
@@ -58,7 +65,7 @@ def get_os_version():
                         vm_dist = (vm_dist.replace('\"','')).replace('\n','')
                     elif (parsed_line[0] == 'VERSION_ID'):
                         vm_ver = (parsed_line[1].split('.'))[0]
-                        vm_ver = (vm_dist.replace('\"','')).replace('\n','')
+                        vm_ver = (vm_ver.replace('\"','')).replace('\n','')
         except:
             return None
 
@@ -134,6 +141,20 @@ def get_rpm_pkg_version(pkg):
         return None
     except subprocess.CalledProcessError:
         return None
+
+def update_curr_oms_version(found_errs):
+    try:
+        doc_file = urlopen(omsagent_url)
+        for line in doc_file.readlines():
+            line = line.decode('utf8')
+            if line.startswith("omsagent | "):
+                parsed_line = line.split(' | ') # [package, version, description]
+                tsg_info['UPDATED_OMS_VERSION'] = parsed_line[1]
+                return 0
+            return 113
+    except IOError as e:
+        found_errs.append((omsagent_url, e))
+        return 120
 
 # omsadmin.conf
 def update_omsadmin():

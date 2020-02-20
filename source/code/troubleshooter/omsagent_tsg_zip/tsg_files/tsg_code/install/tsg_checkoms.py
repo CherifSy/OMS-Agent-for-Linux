@@ -1,17 +1,9 @@
 import re
-import ssl
-import urllib
 
-from tsg_info                import tsg_info, update_omsadmin
-from tsg_errors              import tsg_error_info, get_input, print_errors
+from tsg_info                import tsginfo_lookup, update_curr_oms_version, update_omsadmin
+from tsg_errors              import tsg_error_info, is_error, get_input, print_errors
 from connect.tsg_checkendpts import check_internet_connect
 from .tsg_checkpkgs          import get_package_version
-
-# urlopen() in different packages in Python 2 vs 3
-try:
-    from urllib.request import urlopen
-except ImportError:
-    from urllib2 import urlopen
 
 
 
@@ -22,31 +14,6 @@ def get_oms_version():
     if (version == None):
         return None
     return version
-
-
-
-# get most recent OMS version released
-def get_curr_oms_version():
-    omsagent_url = "https://raw.github.com/microsoft/OMS-Agent-for-Linux/master/docs/OMS-Agent-for-Linux.md"
-    try:
-        doc_file = urlopen(omsagent_url)
-        for line in doc_file.readlines():
-            line = line.decode('utf8')
-            if line.startswith("omsagent | "):
-                parsed_line = line.split(' | ') # [package, version, description]
-                tsg_info['UPDATED_OMS_VERSION'] = parsed_line[1]
-                return parsed_line[1]
-        return None
-    except IOError as e:
-        print(e)
-        print(e.strerror)
-        checked_internet = check_internet_connect()
-        if (checked_internet != 0):
-            print_errors(checked_internet, reinstall=False)
-        else:
-            tsg_error_info.append((omsagent_url,))
-            print_errors(120, reinstall=False)
-        return None
 
 
 
@@ -115,11 +82,27 @@ def check_oms():
         tsg_error_info.append((oms_version, tsg_info['CPU_BITS']))
         return 112
 
-    # if not most updated version, ask if want to update
-    curr_oms_version = get_curr_oms_version()
-    if (curr_oms_version == None):
-        return 113
+    # get most recent version
+    found_errs = []
+    updated_curr_oms_version = update_curr_oms_version(found_errs)
 
+    # found issue in getting most recent version
+    if (is_error(updated_curr_oms_version)):
+        # error in page itself
+        if (updated_curr_oms_version == 113):
+            return 113
+        # error in connection, check connection
+        checked_internet = check_internet_connect()
+        if (is_error(checked_internet)):
+            return checked_internet
+        # connection in general fine, connecting to current page not
+        else:
+            tsg_error_info.append(found_errs[0])
+            return 120
+
+    curr_oms_version = tsginfo_lookup('UPDATED_OMS_VERSION')
+
+    # if not most recent version, ask if want to update
     if (not comp_versions_ge(oms_version, curr_oms_version)):
         if (ask_update_old_version(oms_version, curr_oms_version) == 1):
             return 1

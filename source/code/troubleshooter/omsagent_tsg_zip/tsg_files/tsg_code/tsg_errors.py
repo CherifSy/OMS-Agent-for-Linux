@@ -61,7 +61,7 @@ tsg_error_codes = {
     117 : "RSA key is invalid, please check {0} for the issue.",
     118 : "File {0} is empty.",
     119 : "Couldn't get {0}. Please check {1} for the issue.",
-    120 : "Machine couldn't connect to {0}",
+    120 : "Machine couldn't connect to {0}: {1}",
     121 : "The agent is configured to report to a different workspace - the GUID "\
           "given is {0}, while the workspace is {1}.",
     122 : "The agent isn't running / will not start. {0}",

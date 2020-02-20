@@ -38,7 +38,7 @@ def check_agent_service_endpt():
     if (check_endpt(agent_endpt)):
         return 0
     else:
-        tsg_error_info.append((agent_endpt,))
+        tsg_error_info.append((agent_endpt, "couldn't ping endpoint"))
         return 120
 
 
