@@ -129,7 +129,10 @@ tsg_error_codes = {
     150 : "Logrotate isn't rotating log {0}: its current size is {1}, and it should have "\
           "been rotated at {2}. Please see {3} for more information.",
     151 : "File {0} has been modified {1} times in the last {2} seconds.",
-    152 : "{0} isn't installed correctly."
+    152 : "{0} isn't installed correctly.",
+    153 : "The SSL python package isn't installed in this version of Python. (You can check "\
+          "by opening up python and typing 'import ssl'.) Please install this package "\
+          "and run the troubleshooter again."
 
 }  # TODO: keep up to date with error codes onenote
 

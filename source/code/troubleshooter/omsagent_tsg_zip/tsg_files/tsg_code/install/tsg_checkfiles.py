@@ -270,13 +270,7 @@ def check_filesystem():
     perms_err = []
 
     datafiles = os.listdir(dfs_path)
-    for df in datafiles:
-        # skip if wrong distro
-        if (tsginfo_lookup('OS_READABLE_ID') == 'rhel' and df == 'wid_files_ubuntu.data'):
-            continue
-        if (tsginfo_lookup('OS_READABLE_ID') == 'ubuntu' and df == 'wid_files_redhat.data'):
-            continue
-        
+    for df in datafiles:        
         variables = dict()  # {var name : content}
         files = dict()      # {path : [perms, user, group]}
         links = dict()      # {path : [perms, user, group, linked path]}
@@ -290,10 +284,6 @@ def check_filesystem():
         # TEMP FIX: look for specific directory if in linux_rpm.data
         if ((df == "linux_rpm.data") and (not os.path.exists('/usr/sbin/semodule'))):
             continue
-
-        # getting workspace id for protected files
-        if (df.startswith("wid_files_")):
-            variables['WORKSPACE_ID'] = tsginfo_lookup('WORKSPACE_ID')
 
         # populate dictionaries with info from data files
         get_data((os.path.join(dfs_path, df)), variables, files, links, dirs)

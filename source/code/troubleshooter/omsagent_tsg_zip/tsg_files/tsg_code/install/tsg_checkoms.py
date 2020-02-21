@@ -17,6 +17,32 @@ def get_oms_version():
 
 
 
+# check errors if getting curr oms version errors out
+def check_curr_oms_errs(updated_curr_oms_version, found_errs):
+    # error in page itself
+    if (updated_curr_oms_version == 113):
+        return 113
+
+    # error in connection, check connection
+    checked_internet = check_internet_connect()
+    if (is_error(checked_internet)):
+        return checked_internet
+
+    # ssl package not installed
+    if (found_errs[0] == "<urlopen error unknown url type: https>"):
+        try:
+            import ssl
+            tsg_error_info.append(found_errs[0])
+            return 120
+        except ImportError as e:
+            return 153
+    # connection in general fine, connecting to current page not
+    else:
+        tsg_error_info.append(found_errs[0])
+        return 120
+
+
+
 # compare two versions, see if the first is newer than / the same as the second
 def comp_versions_ge(v1, v2):
     # split on '.' and '-'
@@ -46,8 +72,6 @@ def comp_versions_ge(v1, v2):
     # check if subversion is newer (e.g. 1.11.3 to 1.11)
     return (len(v1_split) >= len(v2_split))
     
-    
-
 def ask_update_old_version(oms_version, curr_oms_version):
     print("--------------------------------------------------------------------------------")
     print("You are currently running OMS Verion {0}. There is a newer version\n"\
@@ -85,20 +109,8 @@ def check_oms():
     # get most recent version
     found_errs = []
     updated_curr_oms_version = update_curr_oms_version(found_errs)
-
-    # found issue in getting most recent version
     if (is_error(updated_curr_oms_version)):
-        # error in page itself
-        if (updated_curr_oms_version == 113):
-            return 113
-        # error in connection, check connection
-        checked_internet = check_internet_connect()
-        if (is_error(checked_internet)):
-            return checked_internet
-        # connection in general fine, connecting to current page not
-        else:
-            tsg_error_info.append(found_errs[0])
-            return 120
+        return check_curr_oms_errs(updated_curr_oms_version, found_errs)
 
     curr_oms_version = tsginfo_lookup('UPDATED_OMS_VERSION')
 

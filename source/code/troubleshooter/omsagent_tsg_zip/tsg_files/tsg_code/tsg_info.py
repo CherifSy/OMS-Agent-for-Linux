@@ -1,5 +1,6 @@
 import errno
 import platform
+import ssl
 import subprocess
 
 from tsg_errors import tsg_error_info, print_errors
@@ -45,6 +46,7 @@ dist_to_id = {'redhat' : 'rhel',
               'debian' : 'debian',
               'ubuntu' : 'ubuntu',
               'suse' : 'sles',
+              'sles' : 'sles',
               'amzn' : 'amzn'}
 
 # OS Info
@@ -151,7 +153,7 @@ def update_curr_oms_version(found_errs):
                 parsed_line = line.split(' | ') # [package, version, description]
                 tsg_info['UPDATED_OMS_VERSION'] = parsed_line[1]
                 return 0
-            return 113
+        return 113
     except IOError as e:
         found_errs.append((omsagent_url, e))
         return 120
